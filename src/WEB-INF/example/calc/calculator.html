@@ -1,0 +1,43 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="author" content="Sascha Baumeister" />
+		<meta name="dcterms.rightsHolder" content="Sascha Baumeister" />
+		<meta name="dcterms.rights" content="all rights reserved" />
+		<meta name="dcterms.dateCopyrighted" content="2022" />
+
+		<title>Calculator</title>
+		<script type="module" src="calculator-controller.js"></script>
+	</head>
+
+
+	<body>
+		<header>
+		</header>
+		<main>
+			<article class="left"></article>
+			<article class="center">
+				<div class="input">
+					<input class="left-operand result" type="number" readonly="true" value="0"></input>
+					<input class="right-operand" type="number" value="0"></input>
+				</div>
+				<div class="control">
+					<button class="assign">=</button>
+					<button class="sum">+</button>
+					<button class="difference">-</button>
+					<button class="product">*</button>
+					<button class="quotient">/</button>
+					<button class="modul">%</button>
+					<button class="exponent">**</button>
+					<button class="root">root</button>
+					<button class="logarithm">log</button>
+				<div>
+			</article>
+			<article class="right"></article>
+		</main>
+		<footer>
+			<output class="message"></output>
+		</footer>
+	</body>
+</html>

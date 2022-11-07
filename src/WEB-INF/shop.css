@@ -1,0 +1,228 @@
+/*
+ * The application's CSS3 stylesheet.
+ */
+body {
+	margin: 1em 1em;
+	line-height: 1.5em;
+	font-size: 14px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #221100;
+	background: #ebebeb;
+}
+
+
+main {
+	display: flex;
+}
+
+article.left, article.right {
+	width: 0em;
+}
+
+article.center {
+	width: 50em;
+}
+
+section {
+	margin-bottom: 1.5em;
+}
+
+
+h1 {
+	font-size: 140%;
+	margin-bottom: .4em;
+}
+
+h2 {
+	font-size: 120%;
+	margin-bottom: .2em;
+}
+
+fieldset {
+	background: #e2e2e2;
+	margin: 0;
+}
+
+textarea {
+	vertical-align: middle;
+}
+
+legend {
+	font-size: 60%;
+}
+
+label.horizontal {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+td.numeric, th.numeric, input.numeric {
+	text-align: end;
+}
+
+output.message {
+	color: red;
+	font-weight: bolder;
+}
+
+
+section.authentication label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5em;
+}
+
+
+section.preferences label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5em;
+}
+
+
+section.preferences img.avatar {
+	vertical-align: middle;
+	height: 5em;
+	width: 5em;
+}
+
+section.preferences input.account {
+	width: 16.5em;
+}
+
+section.preferences input.address {
+	width: 16.5em;
+}
+
+section.preferences input.postcode {
+	width: 3em;
+}
+
+section.preferences input.phone {
+	display: block;
+}
+
+
+section.own-offers img.avatar {
+	vertical-align: middle;
+	height: 2em;
+	width: 2em;
+}
+
+
+section.own-offer label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5.5em;
+}
+
+section.own-offer img.avatar {
+	vertical-align: middle;
+	height: 5em;
+	width: 5em;
+}
+
+section.own-order div.row {
+	display: flex;
+	margin: 0em 0em 2em 0em;
+}
+
+section.own-order textarea.description {
+	background-color: #ebebeb;
+}
+
+section.own-order label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5.5em;
+}
+
+section.own-order img.avatar {
+	vertical-align: middle;
+	height: 10em;
+	width: 10em;
+}
+
+
+section.offer-query {
+	display: flex;
+}
+
+section.offer-query div.offer-criteria {
+	width: 23em;
+}
+
+section.offer-query div.seller-criteria {
+	width: 18em;
+}
+
+section.offer-query div.seller-criteria fieldset {
+	padding: 0em 0em 4.4em 0em;
+}
+
+section.offer-query div.offer-criteria label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 10em;
+}
+
+section.offer-query div.seller-criteria label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 6em;
+}
+
+section.seller-selection img.avatar {
+	vertical-align: middle;
+	height: 2em;
+	width: 2em;
+}
+
+section.available-offers img.avatar {
+	vertical-align: middle;
+	height: 2em;
+	width: 2em;
+}
+
+
+section.available-offer fieldset {
+	display: flex;
+}
+
+section.available-offer textarea.description {
+	background-color: #ebebeb;
+}
+
+section.available-offer label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5.5em;
+}
+
+section.available-offer img.avatar {
+	vertical-align: middle;
+	height: 10em;
+	width: 10em;
+}
+
+
+section.shopping-cart fieldset div.row {
+	display: flex;
+	margin: 0em 0em 2em 0em;
+}
+
+section.shopping-cart textarea.description {
+	background-color: #ebebeb;
+}
+
+section.shopping-cart label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5.5em;
+}
+
+section.shopping-cart img.avatar {
+	vertical-align: middle;
+	height: 10em;
+	width: 10em;
+}
