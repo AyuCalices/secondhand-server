@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../secondhand-model/secondhand-model.iml" filepath="$PROJECT_DIR$/../secondhand-model/secondhand-model.iml" />
       <module fileurl="file://$PROJECT_DIR$/secondhand-server.iml" filepath="$PROJECT_DIR$/secondhand-server.iml" />
     </modules>
   </component>

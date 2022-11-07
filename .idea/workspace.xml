@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1863045c-7554-4b7c-a181-a68a3210bb52" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/secondhand-server.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+    <list default="true" id="1863045c-7554-4b7c-a181-a68a3210bb52" name="Changes" comment="init project">
+      <change afterPath="$PROJECT_DIR$/../secondhand-model/src/edu/htw/secondhand/service/Filler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../secondhand-model/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../secondhand-model/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../secondhand-model/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../secondhand-model/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../secondhand-model/secondhand-model.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../secondhand-model/secondhand-model.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../secondhand-model/src/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/../secondhand-model/src/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/secondhand-server.iml" beforeDir="false" afterPath="$PROJECT_DIR$/secondhand-server.iml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../secondhand-model" />
   </component>
   <component name="ProjectId" id="2HEZCxAVXipmp2t9nsh66HgiAb9" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -29,12 +38,33 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
+    "last_opened_file_path": "C:/Users/raja1/IdeaProjects/secondhand-model",
+    "project.structure.last.edited": "Global Libraries",
+    "project.structure.proportion": "0.15332031",
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="ApplicationContainer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.htw.secondhand.server.ApplicationContainer" />
+      <module name="secondhand-server" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.htw.secondhand.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.ApplicationContainer" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

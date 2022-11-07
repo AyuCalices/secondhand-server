@@ -13,5 +13,6 @@
     <orderEntry type="library" name="json-yasson-1.0.1" level="application" />
     <orderEntry type="library" name="jval-hibernate-6.0" level="application" />
     <orderEntry type="library" name="server-api-11.0" level="application" />
+    <orderEntry type="module" module-name="secondhand-model" />
   </component>
 </module>
