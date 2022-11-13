@@ -14,6 +14,7 @@ module edu.htw.secondhand.server {
 	requires transitive java.ws.rs;
 	requires transitive jersey.server;
 	requires transitive jersey.container.jdk.http;
+    requires transitive jersey.common;
 
-	opens edu.htw.secondhand.server;
+    opens edu.htw.secondhand.server;
 }
