@@ -1,5 +1,5 @@
 <!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="author" content="Sascha Baumeister" />
@@ -24,11 +24,13 @@
 					<legend>Login</legend>
 					<div>
 						<label class="horizontal">Email</label>
-						<input class="email" type="email" maxlength="128" />
+<!--						TODO: revert email field -->
+						<input class="email" type="email" maxlength="128" value="ines.bergmann@web.de" />
 					</div>
 					<div>
 						<label class="horizontal">Password</label>
-						<input class="password" type="password" maxlength="32" />
+<!--						TODO: revert password field -->
+						<input class="password" type="password" maxlength="32" value="ines" />
 					</div>
 				</fieldset>
 				<button class="login" type="button" title="perform authentication">login</button>
@@ -523,7 +525,8 @@
 		<header>
 			<nav class="horizontal">
 				<button class="authentication" type="button">Login</button>
-				<button class="preferences" type="button" disabled="true">Preferences</button>
+<!--				TODO: revert to make make preferences button disabled -->
+				<button class="preferences" type="button">Preferences</button>
 				<button class="offers" type="button" disabled="true">Offers</button>
 				<button class="orders" type="button" disabled="true">Orders</button>
 				<button class="shopping" type="button" disabled="true">Shopping</button>
