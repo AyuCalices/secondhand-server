@@ -40,18 +40,14 @@ export default class PreferencesController extends MenuController {
 		const sessionOwner = Controller.sessionOwner;
 		const section = document.querySelector("section.preferences");
 		const elements = section.querySelectorAll("img, input");
-		
-		console.log("sessionOwner: ", sessionOwner);
 
 		elements[0].src = "/services/documents/" + sessionOwner.avatarReference + "?cache-bust=" + Date.now();
-
 		elements[1].value = sessionOwner.email;
 		elements[2].value = "";
 		elements[3].value = sessionOwner.group;
 		elements[4].value = sessionOwner.name.title ?? "";
 		elements[5].value = sessionOwner.name.forename;
 		elements[6].value = sessionOwner.name.surname;
-
 		elements[7].value = sessionOwner.address.street;
 		elements[8].value = sessionOwner.address.postcode;
 		elements[9].value = sessionOwner.address.city;
