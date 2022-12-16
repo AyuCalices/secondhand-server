@@ -36,12 +36,12 @@ class PreferencesController extends Controller {
         sendButton.addEventListener("touchstart", eventHandler);
 
         // show data
-        this.displaySessionOwner(template, section);
+        this.activateSessionOwner(template, section);
 
         // Controller.sessionOwner = null;
     }
 
-    displaySessionOwner(template, section) {
+    activateSessionOwner(template, section) {
         const sessionOwner = Controller.sessionOwner;
         const elements = section.querySelectorAll("img, input");
 
@@ -65,13 +65,13 @@ class PreferencesController extends Controller {
         phoneInputsArray.forEach(e => e.remove());
 
         for (const phone of sessionOwner.phones)
-            this.displaySessionOwnerPhones(phone);
+            this.activateSessionOwnerPhone(phone);
     }
 
     /**
      * Adds the given phone number to the list of phone numbers.
      */
-    displaySessionOwnerPhones(phone) {
+    activateSessionOwnerPhone(phone) {
 
         const phoneFieldset = document.querySelector("main > head template.preferences > fieldset:nth-of-type(4)");
 
@@ -89,7 +89,7 @@ class PreferencesController extends Controller {
     /*
      * Authenticates email and password data.
      */
-    async send() {
+    async send () {
         try {
             const section = document.querySelector("section.preferences");
             const elements = section.querySelectorAll("img, input");
