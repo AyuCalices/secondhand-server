@@ -27,6 +27,8 @@ class PreferencesController extends Controller {
         const section = template.content.cloneNode(true).firstElementChild;
         centerArticle.append(section);
 
+        const image = section.querySelector("img")
+        image.addEventListener("drop", (event) => { this.sendAvatar(event.dataTransfer.files[0]) });
 
         const sendButton = section.querySelector("button.send");
         const eventHandler = event => this.send();
@@ -43,11 +45,7 @@ class PreferencesController extends Controller {
         const sessionOwner = Controller.sessionOwner;
         const elements = section.querySelectorAll("img, input");
 
-        console.log("session owner: ", sessionOwner);
-        console.log(JSON.stringify(Controller.sessionOwner))
-
-        //TODO: below seems to work ... (copied from skat)
-        elements[0].src = "/services/documents/" + sessionOwner.avatarReference + "?cache-bust=" + Date.now();
+        elements[0].src = "/services/documents/" + sessionOwner.avatarReference;
 
         elements[1].value = sessionOwner.email;
         elements[2].value = "";
@@ -62,8 +60,6 @@ class PreferencesController extends Controller {
         elements[11].value = sessionOwner.account.bic;
         elements[12].value = sessionOwner.account.iban;
 
-
-        //TODO: from skat viable ? test below for showing phone numbers!
         const phoneInputsDom = document.querySelectorAll("head template.preferences fieldset.phones input")
         const phoneInputsArray = Array.from(phoneInputsDom);
         phoneInputsArray.forEach(e => e.remove());
@@ -119,7 +115,8 @@ class PreferencesController extends Controller {
             const headers = {"Content-Type": "application/json"};
             if (password) headers["X-Set-Password"] = password;
 
-            const response = await fetch("/services/people", {
+            const currentAvatarReference = Controller.sessionOwner.avatarReference;
+            const response = await fetch("/services/people?avatarReference=" + currentAvatarReference, {
                 method: "POST",
                 headers: headers,
                 body: JSON.stringify(modifiedSessionOwner),
@@ -136,6 +133,42 @@ class PreferencesController extends Controller {
             this.displayMessage(error)
         }
     }
+
+    async sendAvatar(avatarFile) {
+        try {
+            const imgContainer = document.querySelector("section.preferences img");
+            let response;
+            response = await fetch("/services/documents", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": avatarFile.type,
+                    "Accept": "text/plain"
+                },
+                body: avatarFile
+            });
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+            const avatarReference = parseInt(await response.text());
+
+            Controller.sessionOwner.avatarReference = avatarReference;
+
+            response = await fetch("/services/people?avatarReference=" + avatarReference, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "text/plain"
+                },
+                body: JSON.stringify(Controller.sessionOwner)
+            });
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+
+            imgContainer.src = "/services/documents/" + avatarReference;
+        } catch (error) {
+            this.displayMessage(error);
+        }
+    }
+
 }
 
 
