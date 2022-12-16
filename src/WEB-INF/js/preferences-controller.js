@@ -7,12 +7,14 @@ import xhr from "./xhr.js"
  * Copyright (c) 2022 Sascha Baumeister
  */
 class PreferencesController extends Controller {
+    #centerArticle;
 
     /*
      * Initializes a new instance.
      */
     constructor () {
         super();
+        this.#centerArticle = document.querySelector("main article.center");
     }
 
 
@@ -20,28 +22,30 @@ class PreferencesController extends Controller {
      * Activates this controller.
      */
     activate () {
-        const centerArticle = document.querySelector("main article.center");
-        this.clearChildren(centerArticle);
+        this.clearChildren(this.#centerArticle);
 
         const template = document.querySelector("head template.preferences");
         const section = template.content.cloneNode(true).firstElementChild;
-        centerArticle.append(section);
+        this.#centerArticle.append(section);
 
-        const image = section.querySelector("img")
-        image.addEventListener("drop", (event) => { this.sendAvatar(event.dataTransfer.files[0]) });
+        const avatarImage = section.querySelector("img.avatar")
+        avatarImage.addEventListener("drop", event => this.sendAvatar(event.dataTransfer.files[0]));
 
         const sendButton = section.querySelector("button.send");
-        const eventHandler = event => this.send();
+        const eventHandler = event => this.sendSessionOwner();
         sendButton.addEventListener("click", eventHandler);
         sendButton.addEventListener("touchstart", eventHandler);
 
+        const addButton = section.querySelector("button.add");
+        addButton.addEventListener("click", event => this.addSessionOwnerPhone(""));
+
         // show data
-        this.activateSessionOwner(template, section);
+        this.activateSessionOwner(section);
 
         // Controller.sessionOwner = null;
     }
 
-    activateSessionOwner(template, section) {
+    activateSessionOwner(section) {
         const sessionOwner = Controller.sessionOwner;
         const elements = section.querySelectorAll("img, input");
 
@@ -49,7 +53,7 @@ class PreferencesController extends Controller {
 
         elements[1].value = sessionOwner.email;
         elements[2].value = "";
-        elements[3].value = sessionOwner.name.title;
+        elements[3].value = sessionOwner.name.title || "";
         elements[4].value = sessionOwner.name.given;
         elements[5].value = sessionOwner.name.family;
         elements[6].value = sessionOwner.group;
@@ -60,110 +64,97 @@ class PreferencesController extends Controller {
         elements[11].value = sessionOwner.account.bic;
         elements[12].value = sessionOwner.account.iban;
 
-        const phoneInputsDom = document.querySelectorAll("head template.preferences fieldset.phones input")
-        const phoneInputsArray = Array.from(phoneInputsDom);
-        phoneInputsArray.forEach(e => e.remove());
+        const phoneInputs = Array.from(section.querySelectorAll("div.phones input"));
+        phoneInputs.forEach(e => e.remove());
 
         for (const phone of sessionOwner.phones)
-            this.activateSessionOwnerPhone(phone);
+            this.addSessionOwnerPhone(phone);
     }
 
     /**
      * Adds the given phone number to the list of phone numbers.
      */
-    activateSessionOwnerPhone(phone) {
+    addSessionOwnerPhone(phone) {
+        const phonesDiv = this.#centerArticle.querySelector("section.preferences div.phones");
 
-        const phoneFieldset = document.querySelector("main > head template.preferences > fieldset:nth-of-type(4)");
-
-        const div = document.createElement("div");
-        const input = document.createElement("input");
-        input.value = phone;
-        div.append(input);
-
-        const buttonDiv = phoneFieldset.querySelector("div:last-of-type");
-        buttonDiv.remove();
-        phoneFieldset.append(div);
-        phoneFieldset.append(buttonDiv);
+        const phoneDiv = document.createElement("div");
+        const phoneInput = document.createElement("input");
+        phoneInput.type = "text";
+        phoneInput.value = phone;
+        phoneDiv.append(phoneInput);
+        phonesDiv.append(phoneDiv);
     }
 
     /*
      * Authenticates email and password data.
      */
-    async send () {
+    async sendSessionOwner () {
+        this.displayMessage("");
         try {
-            const section = document.querySelector("section.preferences");
+            const section = this.#centerArticle.querySelector("section.preferences");
             const elements = section.querySelectorAll("img, input");
-            const password = elements[2].value.trim();
+            const password = elements[2].value.trim() || null;
 
-            const modifiedSessionOwner = JSON.parse(JSON.stringify(Controller.sessionOwner));
-            modifiedSessionOwner.email = elements[1].value.trim();
-            modifiedSessionOwner.name.title = elements[3].value.trim();
-            modifiedSessionOwner.name.given = elements[4].value.trim();
-            modifiedSessionOwner.name.family = elements[5].value.trim();
-            modifiedSessionOwner.group = elements[6].value.trim();
-            modifiedSessionOwner.address.street = elements[7].value.trim();
-            modifiedSessionOwner.address.postcode = elements[8].value.trim();
-            modifiedSessionOwner.address.city = elements[9].value.trim();
-            modifiedSessionOwner.address.country = elements[10].value.trim();
+            const sessionOwnerClone = structuredClone(Controller.sessionOwner);
+            sessionOwnerClone.email = elements[1].value.trim();
+            sessionOwnerClone.name.title = elements[3].value.trim() || null;
+            sessionOwnerClone.name.given = elements[4].value.trim();
+            sessionOwnerClone.name.family = elements[5].value.trim();
+            sessionOwnerClone.group = elements[6].value.trim();
+            sessionOwnerClone.address.street = elements[7].value.trim();
+            sessionOwnerClone.address.postcode = elements[8].value.trim();
+            sessionOwnerClone.address.city = elements[9].value.trim();
+            sessionOwnerClone.address.country = elements[10].value.trim();
+            sessionOwnerClone.account.bic = elements[11].value.trim();
+            sessionOwnerClone.account.iban = elements[12].value.trim();
 
-            const phoneInputs = document.querySelectorAll("section.preferences fieldset.phones input");
-            modifiedSessionOwner.phones.length = 0;
+            const phoneInputs = section.querySelectorAll("div.phones input");
+            sessionOwnerClone.phones.length = 0;
 
             for (const inputField of phoneInputs)
-                if (inputField.value) modifiedSessionOwner.phones.push(inputField.value.trim());
+                if (inputField.value.trim()) sessionOwnerClone.phones.push(inputField.value.trim());
 
-            const headers = {"Content-Type": "application/json"};
+            const headers = {"Content-Type": "application/json", "Accept" : "text/plain"};
             if (password) headers["X-Set-Password"] = password;
 
-            const currentAvatarReference = Controller.sessionOwner.avatarReference;
-            const response = await fetch("/services/people?avatarReference=" + currentAvatarReference, {
-                method: "POST",
-                headers: headers,
-                body: JSON.stringify(modifiedSessionOwner),
-                credentials: "include"
+            const response = await fetch("/services/people/", {
+                method: "POST", headers: headers, body: JSON.stringify(sessionOwnerClone), credentials: "include"
             });
-            if (!reponse.ok) throw new Error("HTTP " + reponse.status + " " + reponse.statusText);
-            const answer = await response.text();
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
-            if (password) {
-                const person = await xhr("/services/people/0", "GET", {"Accept": "application/json"}, null, "json", modifiedSessionOwner.email, password);
-                Controller.sessionOwner = person;
-            }
+            if (password)
+                Controller.sessionOwner = await xhr("/services/people/0", "GET", {"Accept": "application/json"}, null, "json", sessionOwnerClone.email, password);
+            else
+                Controller.sessionOwner = sessionOwnerClone;
+
+            this.activateSessionOwner(section);
         } catch (error) {
             this.displayMessage(error)
         }
     }
 
     async sendAvatar(avatarFile) {
+        this.displayMessage("");
         try {
-            const imgContainer = document.querySelector("section.preferences img");
-            let response;
+            const avatarImage = document.querySelector("section.preferences img.avatar");
+            let response, headers;
+
+            headers = {"Content-Type": avatarFile.type, "Accept": "text/plain"};
             response = await fetch("/services/documents", {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": avatarFile.type,
-                    "Accept": "text/plain"
-                },
-                body: avatarFile
+                method: "POST", credentials: "include", headers: headers, body: avatarFile
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
             const avatarReference = parseInt(await response.text());
 
-            Controller.sessionOwner.avatarReference = avatarReference;
-
+            headers = {"Content-Type": "application/json", "Accept": "text/plain"};
             response = await fetch("/services/people?avatarReference=" + avatarReference, {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "text/plain"
-                },
-                body: JSON.stringify(Controller.sessionOwner)
+                method: "POST", credentials: "include", headers: headers, body: JSON.stringify(Controller.sessionOwner)
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
-            imgContainer.src = "/services/documents/" + avatarReference;
+            //avatarImage.src = "/services/documents/" + avatarReference + "?cache-bust=" + Date.now();
+            avatarImage.src = "/services/documents/" + avatarReference;
+            Controller.sessionOwner.avatarReference = avatarReference;
         } catch (error) {
             this.displayMessage(error);
         }
@@ -186,6 +177,4 @@ window.addEventListener("load", event => {
         controlElement.addEventListener("click", eventHandler);
         controlElement.addEventListener("touchstart", eventHandler);
     }
-
-    controlElements[0].click();
 });
