@@ -90,31 +90,51 @@ class PreferencesController extends Controller {
         phoneFieldset.append(buttonDiv);
     }
 
-
     /*
      * Authenticates email and password data.
      */
     async send () {
-        this.displayMessage("send button clicked")
-        const centerArticle = document.querySelector("main article.center");
-        const emailElement = centerArticle.querySelector("input.email");
-        const passwordElement = centerArticle.querySelector("input.password");
+        try {
+            const section = document.querySelector("section.preferences");
+            const elements = section.querySelectorAll("img, input");
+            const password = elements[2].value.trim();
 
-        // const email = emailElement.value.trim();
-        // const password = passwordElement.value.trim();
-        //
-        // this.displayMessage();
-        // try {
-        //     const person = await xhr("/services/people/0", "GET", {"Accept": "application/json"}, null, "json", email, password);
-        //     Controller.sessionOwner = person;
-        //
-        //     const controlElements = document.querySelectorAll("header button");
-        //     for (const controlElement of controlElements)
-        //         controlElement.disabled = false;
-        //     controlElements[1].click();
-        // } catch (error) {
-        //     this.displayMessage(error);
-        // }
+            const modifiedSessionOwner = JSON.parse(JSON.stringify(Controller.sessionOwner));
+            modifiedSessionOwner.email = elements[1].value.trim();
+            modifiedSessionOwner.name.title = elements[3].value.trim();
+            modifiedSessionOwner.name.given = elements[4].value.trim();
+            modifiedSessionOwner.name.family = elements[5].value.trim();
+            modifiedSessionOwner.group = elements[6].value.trim();
+            modifiedSessionOwner.address.street = elements[7].value.trim();
+            modifiedSessionOwner.address.postcode = elements[8].value.trim();
+            modifiedSessionOwner.address.city = elements[9].value.trim();
+            modifiedSessionOwner.address.country = elements[10].value.trim();
+
+            const phoneInputs = document.querySelectorAll("section.preferences fieldset.phones input");
+            modifiedSessionOwner.phones.length = 0;
+
+            for (const inputField of phoneInputs)
+                if (inputField.value) modifiedSessionOwner.phones.push(inputField.value.trim());
+
+            const headers = {"Content-Type": "application/json"};
+            if (password) headers["X-Set-Password"] = password;
+
+            const response = await fetch("/services/people", {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(modifiedSessionOwner),
+                credentials: "include"
+            });
+            if (!reponse.ok) throw new Error("HTTP " + reponse.status + " " + reponse.statusText);
+            const answer = await response.text();
+
+            if (password) {
+                const person = await xhr("/services/people/0", "GET", {"Accept": "application/json"}, null, "json", modifiedSessionOwner.email, password);
+                Controller.sessionOwner = person;
+            }
+        } catch (error) {
+            this.displayMessage(error)
+        }
     }
 }
 
