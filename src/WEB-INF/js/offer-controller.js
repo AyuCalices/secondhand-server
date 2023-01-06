@@ -26,38 +26,43 @@ class OfferController extends Controller {
 
         const offers = await this.getOffers();
 
-        const templateOwn = document.querySelector("head template.own-offers");
-        const sectionOwn = templateOwn.content.cloneNode(true).firstElementChild;
-        this.#centerArticle.append(sectionOwn);
+        const templateOwnOffers = document.querySelector("head template.own-offers");
+        const sectionOwnOffers = templateOwnOffers.content.cloneNode(true).firstElementChild;
+        this.#centerArticle.append(sectionOwnOffers);
 
-        offers.forEach(offer => {
+        const newButton = sectionOwnOffers.querySelector("button.new");
+        newButton.addEventListener('click', () => this.displayEditSection(null));
 
-            // const templateOwnRow = document.querySelector("head template.own-offer-table-row");
-            // const sectionOwnRow = templateOwnRow.content.cloneNode(true).firstElementChild;
-            // const sectionTables = sectionOwn.querySelectorAll("table");
-            // const sectionTable = sectionTables[0];
-            // const table = sectionTable.getElementsByTagName("tbody");
-            // table.appendChild(sectionOwnRow); // FIXME appendChild not a function
+        const offersTable = this.#centerArticle.querySelector("section.own-offers table.offers");
+        const tableBody = offersTable.querySelector("tbody");
+        console.log(tableBody);
+        const templateOffersTableRow = document.querySelector("head template.own-offer-table-row");
 
-            // const rowCells = sectionOwnRow.querySelectorAll("td");
-            //     rowCells[0].src = "/services/offers/" + (offer.identity || 1) + "/avatar";
-            //     rowCells[1].innerHTML = offer.article.brand;
-            //     rowCells[2].innerHTML = offer.article.alias;
-            //     // rowCells[3].innerHTML = offer.article.alias;
-            //     rowCells[4].innerHTML = offer.price;
-            //     rowCells[5].innerHTML = offer.postage;
+        for (const offer of offers) {
+            const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
+            console.log(sectionOffersTableRow);
+            tableBody.append(sectionOffersTableRow) // FIXME append not a function
+            console.log(offer);
+            const rowCells = sectionOffersTableRow.querySelectorAll("td");
+            rowCells[0].src = "/services/offers/" + offer.identity + "/avatar";
+            rowCells[0].addEventListener('click', event => this.displayEditSection(offer));
 
-        });
+            if (offer.buyerReference) rowCells[1].src = "/services/people/" + offer.buyerReference + "/avatar";
+
+            rowCells[2].append(offer.article.category);
+            rowCells[3].append(offer.article.brand);
+            rowCells[4].append(offer.article.alias);
+            if (offer.serial) rowCells[5].append(offer.serial);
+            rowCells[6].append((offer.price * 0.01).toFixed(2));
+            rowCells[7].append((offer.postage * 0.01).toFixed(2));
+        }
 
         // TODO only load when offer is selected or 'new' button is clicked
-        this.loadEditSection(offers[0]);
-
-        const newButton = sectionOwn.querySelector("button.new");
-        newButton.addEventListener('click', () => this.loadEditSection(null));
+        this.displayEditSection(offers[0]);
 
     }
 
-    loadEditSection(offer) {
+    displayEditSection(offer) {
         const templateOwnOffer = document.querySelector("head template.own-offer");
         const sectionOwnOffer = templateOwnOffer.content.cloneNode(true).firstElementChild;
         this.#centerArticle.append(sectionOwnOffer);
@@ -68,14 +73,13 @@ class OfferController extends Controller {
             sectionOwnOffer.parentNode.removeChild(sectionOwnOffer);
         });
         const createOrUpdateButton = sectionOwnOffer.querySelector("button.create-or-update");
-        createOrUpdateButton.currentOffer = offer;
-        createOrUpdateButton.addEventListener('click', event => this.sendCreatedOrUpdatedOffer(event));
+        createOrUpdateButton.addEventListener('click', event => this.sendCreatedOrUpdatedOffer(offer));
 
         if (offer == null) {
-            createOrUpdateButton.innerHTML = "create";
+            createOrUpdateButton.append("create");
             return;
         }
-        createOrUpdateButton.innerHTML = "update";
+        createOrUpdateButton.append("update");
         sectionOwnOffer.querySelector("input.category.article").value = offer.article.category;
         sectionOwnOffer.querySelector("input.brand.article").value = offer.article.brand;
         sectionOwnOffer.querySelector("input.name.article").value = offer.article.alias;
@@ -95,21 +99,21 @@ class OfferController extends Controller {
         return await response.json();
     }
 
-    async sendCreatedOrUpdatedOffer(event) {
+    async sendCreatedOrUpdatedOffer(offer) {
         this.displayMessage("");
         try {
-            console.log(event.currentTarget.currentOffer);
+            console.log(offer);
 
             const section = this.#centerArticle.querySelector("section.own-offer");
-            const offerClone = structuredClone(event.currentTarget.currentOffer);
+            const offerClone = structuredClone(offer);
 
             offerClone.article.category = section.querySelector("input.category.article").value.trim();
             offerClone.article.brand = section.querySelector("input.brand.article").value.trim();
             offerClone.article.alias = section.querySelector("input.name.article").value.trim();
             offerClone.article.description = section.querySelector("textarea.description.article").value.trim();
             offerClone.serial = section.querySelector("input.serial.article").value.trim() || null;
-            offerClone.price = section.querySelector("input.price.article.numeric").value.trim();
-            offerClone.postage = section.querySelector("input.postage.article.numeric").value.trim();
+            offerClone.price = Math.floor(parseFloat(section.querySelector("input.price.article.numeric").value) * 100);
+            offerClone.postage = Math.floor(parseFloat(section.querySelector("input.postage.article.numeric").value) * 100);
 
             const headers = {"Content-Type": "application/json", "Accept" : "text/plain"};
             const response = await fetch("/services/offers/", {
