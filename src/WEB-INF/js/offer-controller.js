@@ -64,7 +64,7 @@ class OfferController extends Controller {
 
     displayEditSection(offer) {
         console.log(offer);
-        if (this.#editSection) this.#centerArticle.removeChild(this.#editSection);
+        if (this.#editSection) this.removeEditSection();
 
         const templateOwnOffer = document.querySelector("head template.own-offer");
         const sectionOwnOffer = templateOwnOffer.content.cloneNode(true).firstElementChild;
@@ -77,9 +77,7 @@ class OfferController extends Controller {
             sectionOwnOffer.querySelector("img.avatar").src = "/services/documents/1";
 
         const cancelButton = sectionOwnOffer.querySelector("button.cancel");
-        cancelButton.addEventListener('click', () => {
-            sectionOwnOffer.parentNode.removeChild(sectionOwnOffer);
-        });
+        cancelButton.addEventListener('click', event => this.removeEditSection());
         const createOrUpdateButton = sectionOwnOffer.querySelector("button.create-or-update");
         createOrUpdateButton.addEventListener('click', event => this.sendCreatedOrUpdatedOffer(offer));
 
@@ -95,6 +93,11 @@ class OfferController extends Controller {
         sectionOwnOffer.querySelector("input.serial.article").value = offer.serial;
         sectionOwnOffer.querySelector("input.price.article.numeric").value = offer.price;
         sectionOwnOffer.querySelector("input.postage.article.numeric").value = offer.postage;
+    }
+
+    removeEditSection() {
+        this.#centerArticle.removeChild(this.#editSection);
+        this.#editSection = null;
     }
 
     async getOffers() {
