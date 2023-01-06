@@ -63,6 +63,10 @@ class OfferController extends Controller {
         this.#centerArticle.append(sectionOwnOffer);
 
         sectionOwnOffer.querySelector("img.avatar").src = "/services/offers/" + (offer.identity || 1) + "/avatar";
+        const cancelButton = sectionOwnOffer.querySelector("button.cancel");
+        cancelButton.addEventListener('click', () => {
+            sectionOwnOffer.parentNode.removeChild(sectionOwnOffer);
+        });
         const createOrUpdateButton = sectionOwnOffer.querySelector("button.create-or-update");
         createOrUpdateButton.currentOffer = offer;
         createOrUpdateButton.addEventListener('click', event => this.sendCreatedOrUpdatedOffer(event));
