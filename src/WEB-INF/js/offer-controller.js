@@ -35,19 +35,18 @@ class OfferController extends Controller {
 
         const offersTable = this.#centerArticle.querySelector("section.own-offers table.offers");
         const tableBody = offersTable.querySelector("tbody");
-        console.log(tableBody);
         const templateOffersTableRow = document.querySelector("head template.own-offer-table-row");
 
         for (const offer of offers) {
             const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
-            console.log(sectionOffersTableRow);
-            tableBody.append(sectionOffersTableRow) // FIXME append not a function
-            console.log(offer);
-            const rowCells = sectionOffersTableRow.querySelectorAll("td");
-            rowCells[0].src = "/services/offers/" + offer.identity + "/avatar";
-            rowCells[0].addEventListener('click', event => this.displayEditSection(offer));
+            tableBody.append(sectionOffersTableRow)
 
-            if (offer.buyerReference) rowCells[1].src = "/services/people/" + offer.buyerReference + "/avatar";
+            const rowCells = sectionOffersTableRow.querySelectorAll("td");
+            const rowImages = sectionOffersTableRow.querySelectorAll("img");
+            rowImages[0].src = "/services/offers/" + offer.identity + "/avatar";
+            rowImages[0].addEventListener('click', event => this.displayEditSection(offer));
+
+            if (offer.buyerReference) rowImages[1].src = "/services/people/" + offer.buyerReference + "/avatar";
 
             rowCells[2].append(offer.article.category);
             rowCells[3].append(offer.article.brand);
@@ -67,7 +66,11 @@ class OfferController extends Controller {
         const sectionOwnOffer = templateOwnOffer.content.cloneNode(true).firstElementChild;
         this.#centerArticle.append(sectionOwnOffer);
 
-        sectionOwnOffer.querySelector("img.avatar").src = "/services/offers/" + (offer.identity || 1) + "/avatar";
+        if (offer)
+            sectionOwnOffer.querySelector("img.avatar").src = "/services/offers/" + offer.identity + "/avatar";
+        else
+            sectionOwnOffer.querySelector("img.avatar").src = "/services/documents/1";
+
         const cancelButton = sectionOwnOffer.querySelector("button.cancel");
         cancelButton.addEventListener('click', () => {
             sectionOwnOffer.parentNode.removeChild(sectionOwnOffer);
