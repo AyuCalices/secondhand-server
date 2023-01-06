@@ -80,7 +80,7 @@ class OfferController extends Controller {
             return;
         }
         createOrUpdateButton.append("update");
-        sectionOwnOffer.querySelector("input.category.article").value = offer.article.category;
+        sectionOwnOffer.querySelector("select.category.article").value = offer.article.category;
         sectionOwnOffer.querySelector("input.brand.article").value = offer.article.brand;
         sectionOwnOffer.querySelector("input.name.article").value = offer.article.alias;
         sectionOwnOffer.querySelector("textarea.description.article").value = offer.article.description;
@@ -107,7 +107,7 @@ class OfferController extends Controller {
             const section = this.#centerArticle.querySelector("section.own-offer");
             const offerClone = structuredClone(offer);
 
-            offerClone.article.category = section.querySelector("input.category.article").value.trim();
+            offerClone.article.category = section.querySelector("select.category.article").value.trim();
             offerClone.article.brand = section.querySelector("input.brand.article").value.trim();
             offerClone.article.alias = section.querySelector("input.name.article").value.trim();
             offerClone.article.description = section.querySelector("textarea.description.article").value.trim();
