@@ -8,6 +8,7 @@ import xhr from "./xhr.js"
  */
 class OfferController extends Controller {
     #centerArticle;
+    #editSection;
 
     /*
      * Initializes a new instance.
@@ -62,9 +63,13 @@ class OfferController extends Controller {
     }
 
     displayEditSection(offer) {
+        console.log(offer);
+        if (this.#editSection) this.#centerArticle.removeChild(this.#editSection);
+
         const templateOwnOffer = document.querySelector("head template.own-offer");
         const sectionOwnOffer = templateOwnOffer.content.cloneNode(true).firstElementChild;
         this.#centerArticle.append(sectionOwnOffer);
+        this.#editSection = sectionOwnOffer;
 
         if (offer)
             sectionOwnOffer.querySelector("img.avatar").src = "/services/offers/" + offer.identity + "/avatar";
