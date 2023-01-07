@@ -57,10 +57,10 @@ class OfferController extends Controller {
 
             const rowCells = sectionOffersTableRow.querySelectorAll("td");
             const rowImages = sectionOffersTableRow.querySelectorAll("img");
-            rowImages[0].src = "/services/offers/" + offer.identity + "/avatar";
+            rowImages[0].src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
             rowImages[0].addEventListener('click', event => this.displayEditSection(offer));
 
-            if (offer.buyerReference) rowImages[1].src = "/services/people/" + offer.buyerReference + "/avatar";
+            if (offer.buyerReference) rowImages[1].src = "/services/people/" + offer.buyerReference + "/avatar" + "?cache-bust=" + Date.now();
 
             rowCells[2].append(offer.article.category);
             rowCells[3].append(offer.article.brand);
@@ -94,7 +94,7 @@ class OfferController extends Controller {
             return;
         }
         createOrUpdateButton.append("update");
-        avatarImage.src = "/services/offers/" + offer.identity + "/avatar";
+        avatarImage.src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
         sectionOwnOffer.querySelector("select.category.article").value = offer.article.category;
         sectionOwnOffer.querySelector("input.brand.article").value = offer.article.brand;
         sectionOwnOffer.querySelector("input.name.article").value = offer.article.alias;
@@ -173,8 +173,7 @@ class OfferController extends Controller {
                 });
                 if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
             }
-            //avatarImage.src = "/services/documents/" + avatarReference + "?cache-bust=" + Date.now();
-            avatarImage.src = "/services/documents/" + avatarReference;
+            avatarImage.src = "/services/documents/" + avatarReference + "?cache-bust=" + Date.now();
         } catch (error) {
             this.displayMessage(error);
         }
