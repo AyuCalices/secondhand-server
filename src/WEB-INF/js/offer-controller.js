@@ -100,8 +100,8 @@ class OfferController extends Controller {
         sectionOwnOffer.querySelector("input.name.article").value = offer.article.alias;
         sectionOwnOffer.querySelector("textarea.description.article").value = offer.article.description;
         sectionOwnOffer.querySelector("input.serial.article").value = offer.serial;
-        sectionOwnOffer.querySelector("input.price.article.numeric").value = offer.price;
-        sectionOwnOffer.querySelector("input.postage.article.numeric").value = offer.postage;
+        sectionOwnOffer.querySelector("input.price.article.numeric").value = (offer.price * 0.01).toFixed(2);
+        sectionOwnOffer.querySelector("input.postage.article.numeric").value = (offer.postage * 0.01).toFixed(2);
     }
 
     removeEditSection() {
