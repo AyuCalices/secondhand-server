@@ -53,8 +53,8 @@ class OfferController extends Controller {
             rowCells[3].append(offer.article.brand);
             rowCells[4].append(offer.article.alias);
             if (offer.serial) rowCells[5].append(offer.serial);
-            rowCells[6].append((offer.price * 0.01).toFixed(2));
-            rowCells[7].append((offer.postage * 0.01).toFixed(2));
+            rowCells[6].append((offer.price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
+            rowCells[7].append((offer.postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
         }
 
         // TODO only load when offer is selected or 'new' button is clicked
