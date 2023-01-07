@@ -23,7 +23,6 @@ class OfferController extends Controller {
         this.#editSection, this.#reservedAvatarReference = null;
     }
 
-
     /*
      * Activates this controller.
      */
@@ -40,13 +39,21 @@ class OfferController extends Controller {
         const newButton = sectionOwnOffers.querySelector("button.new");
         newButton.addEventListener('click', () => this.displayEditSection(null));
 
+        this.updateOffersSection(offers)
+    }
+
+    updateOffersSection(offers) {
         const offersTable = this.#centerArticle.querySelector("section.own-offers table.offers");
         const tableBody = offersTable.querySelector("tbody");
         const templateOffersTableRow = document.querySelector("head template.own-offer-table-row");
 
+        const newTableBody = document.createElement('tbody');
+        offersTable.replaceChild(newTableBody, tableBody);
+        tableBody.remove();
+
         for (const offer of offers) {
             const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
-            tableBody.append(sectionOffersTableRow)
+            newTableBody.append(sectionOffersTableRow)
 
             const rowCells = sectionOffersTableRow.querySelectorAll("td");
             const rowImages = sectionOffersTableRow.querySelectorAll("img");
@@ -62,10 +69,6 @@ class OfferController extends Controller {
             rowCells[6].append((offer.price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
             rowCells[7].append((offer.postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
         }
-
-        // TODO only load when offer is selected or 'new' button is clicked
-        this.displayEditSection(offers[0]);
-
     }
 
     displayEditSection(offer) {
@@ -139,6 +142,9 @@ class OfferController extends Controller {
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
             this.#reservedAvatarReference = null;
+
+            const offers = await this.getOffers();
+            this.updateOffersSection(offers);
         } catch (error) {
             this.displayMessage(error)
         }
