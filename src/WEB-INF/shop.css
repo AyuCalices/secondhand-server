@@ -57,7 +57,7 @@ label.horizontal {
 }
 
 table {
-	border-spacing: 25px 5px;
+	border-spacing: 20px 5px;
 }
 
 td.numeric, th.numeric, input.numeric {
