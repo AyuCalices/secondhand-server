@@ -10,12 +10,17 @@ class OfferController extends Controller {
     #centerArticle;
     #editSection;
 
+    // used to store the avatarReference when an image is being uploaded
+    // before an offer is created and therefore can be linked to that avatar
+    #reservedAvatarReference;
+
     /*
      * Initializes a new instance.
      */
     constructor () {
         super();
         this.#centerArticle = document.querySelector("main article.center");
+        this.#editSection, this.#reservedAvatarReference = null;
     }
 
 
@@ -24,6 +29,7 @@ class OfferController extends Controller {
      */
     async activate () {
         this.clearChildren(this.#centerArticle);
+        this.#editSection = null;
 
         const offers = await this.getOffers();
 
@@ -71,21 +77,21 @@ class OfferController extends Controller {
         this.#centerArticle.append(sectionOwnOffer);
         this.#editSection = sectionOwnOffer;
 
-        if (offer)
-            sectionOwnOffer.querySelector("img.avatar").src = "/services/offers/" + offer.identity + "/avatar";
-        else
-            sectionOwnOffer.querySelector("img.avatar").src = "/services/documents/1";
-
         const cancelButton = sectionOwnOffer.querySelector("button.cancel");
         cancelButton.addEventListener('click', event => this.removeEditSection());
         const createOrUpdateButton = sectionOwnOffer.querySelector("button.create-or-update");
         createOrUpdateButton.addEventListener('click', event => this.sendCreatedOrUpdatedOffer(offer));
 
+        const avatarImage = sectionOwnOffer.querySelector("img.avatar");
+        avatarImage.addEventListener("drop", event => this.sendAvatar(event.dataTransfer.files[0], offer));
+
         if (offer == null) {
             createOrUpdateButton.append("create");
+            avatarImage.src = "/services/documents/1";
             return;
         }
         createOrUpdateButton.append("update");
+        avatarImage.src = "/services/offers/" + offer.identity + "/avatar";
         sectionOwnOffer.querySelector("select.category.article").value = offer.article.category;
         sectionOwnOffer.querySelector("input.brand.article").value = offer.article.brand;
         sectionOwnOffer.querySelector("input.name.article").value = offer.article.alias;
@@ -97,7 +103,7 @@ class OfferController extends Controller {
 
     removeEditSection() {
         this.#centerArticle.removeChild(this.#editSection);
-        this.#editSection = null;
+        this.#editSection, this.#reservedAvatarReference = null;
     }
 
     async getOffers() {
@@ -113,35 +119,36 @@ class OfferController extends Controller {
     async sendCreatedOrUpdatedOffer(offer) {
         this.displayMessage("");
         try {
-            console.log(offer);
-
             const section = this.#centerArticle.querySelector("section.own-offer");
-            const offerClone = structuredClone(offer);
 
-            offerClone.article.category = section.querySelector("select.category.article").value.trim();
-            offerClone.article.brand = section.querySelector("input.brand.article").value.trim();
-            offerClone.article.alias = section.querySelector("input.name.article").value.trim();
-            offerClone.article.description = section.querySelector("textarea.description.article").value.trim();
-            offerClone.serial = section.querySelector("input.serial.article").value.trim() || null;
-            offerClone.price = Math.floor(parseFloat(section.querySelector("input.price.article.numeric").value) * 100);
-            offerClone.postage = Math.floor(parseFloat(section.querySelector("input.postage.article.numeric").value) * 100);
+            const offerDTO = offer != null ? structuredClone(offer) : {};
+            if (offer == null) offerDTO.article = {};
+
+            offerDTO.article.category = section.querySelector("select.category.article").value.trim();
+            offerDTO.article.brand = section.querySelector("input.brand.article").value.trim();
+            offerDTO.article.alias = section.querySelector("input.name.article").value.trim();
+            offerDTO.article.description = section.querySelector("textarea.description.article").value.trim();
+            offerDTO.serial = section.querySelector("input.serial.article").value.trim() || null;
+            offerDTO.price = Math.floor(parseFloat(section.querySelector("input.price.article.numeric").value) * 100);
+            offerDTO.postage = Math.floor(parseFloat(section.querySelector("input.postage.article.numeric").value) * 100);
 
             const headers = {"Content-Type": "application/json", "Accept" : "text/plain"};
-            const response = await fetch("/services/offers/", {
-                method: "POST", headers: headers, body: JSON.stringify(offerClone), credentials: "include"
+            const requestUrlPath = this.#reservedAvatarReference != null ? "/services/offers?avatarReference=" + this.#reservedAvatarReference : "/services/offers";
+            const response = await fetch(requestUrlPath, {
+                method: "POST", headers: headers, body: JSON.stringify(offerDTO), credentials: "include"
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
-
+            this.#reservedAvatarReference = null;
         } catch (error) {
             this.displayMessage(error)
         }
 
     }
 
-    async sendAvatar(avatarFile) {
+    async sendAvatar(avatarFile, offer) {
         this.displayMessage("");
         try {
-            const avatarImage = document.querySelector("section.preferences img.avatar");
+            const avatarImage = document.querySelector("section.own-offer img.avatar");
             let response, headers;
 
             headers = {"Content-Type": avatarFile.type, "Accept": "text/plain"};
@@ -151,15 +158,17 @@ class OfferController extends Controller {
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
             const avatarReference = parseInt(await response.text());
 
-            headers = {"Content-Type": "application/json", "Accept": "text/plain"};
-            response = await fetch("/services/people?avatarReference=" + avatarReference, {
-                method: "POST", credentials: "include", headers: headers, body: JSON.stringify(Controller.sessionOwner)
-            });
-            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
-
+            if (offer == null) {
+                this.#reservedAvatarReference = avatarReference;
+            } else {
+                headers = {"Content-Type": "application/json", "Accept": "text/plain"};
+                response = await fetch("/services/offers?avatarReference=" + avatarReference, {
+                    method: "POST", credentials: "include", headers: headers, body: JSON.stringify(offer)
+                });
+                if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+            }
             //avatarImage.src = "/services/documents/" + avatarReference + "?cache-bust=" + Date.now();
             avatarImage.src = "/services/documents/" + avatarReference;
-            Controller.sessionOwner.avatarReference = avatarReference;
         } catch (error) {
             this.displayMessage(error);
         }
