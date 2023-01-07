@@ -72,7 +72,6 @@ class OfferController extends Controller {
     }
 
     displayEditSection(offer) {
-        console.log(offer);
         if (this.#editSection) this.removeEditSection();
 
         const templateOwnOffer = document.querySelector("head template.own-offer");
