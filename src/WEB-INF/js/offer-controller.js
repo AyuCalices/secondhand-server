@@ -46,14 +46,11 @@ class OfferController extends Controller {
         const offersTable = this.#centerArticle.querySelector("section.own-offers table.offers");
         const tableBody = offersTable.querySelector("tbody");
         const templateOffersTableRow = document.querySelector("head template.own-offer-table-row");
-
-        const newTableBody = document.createElement('tbody');
-        offersTable.replaceChild(newTableBody, tableBody);
-        tableBody.remove();
+        this.clearChildren(tableBody);
 
         for (const offer of offers) {
             const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
-            newTableBody.append(sectionOffersTableRow)
+            tableBody.append(sectionOffersTableRow)
 
             const rowCells = sectionOffersTableRow.querySelectorAll("td");
             const rowImages = sectionOffersTableRow.querySelectorAll("img");
