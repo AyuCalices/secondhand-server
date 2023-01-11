@@ -154,7 +154,6 @@ class OfferController extends Controller {
         } catch (error) {
             this.displayMessage(error)
         }
-
     }
 
     async sendAvatar(avatarFile, offer) {
@@ -253,6 +252,31 @@ class OfferController extends Controller {
         sectionBuyerInfo.querySelector("input.date.payment").value = new Date(order.payed).toISOString().split('T')[0];
         sectionBuyerInfo.querySelector("input.date.departure").value = new Date(order.departed).toISOString().split('T')[0];
         sectionBuyerInfo.querySelector("input.tracking.order").value = order.trackingReference;
+
+        sectionBuyerInfo.querySelector("button.update").addEventListener('click', event => this.sendUpdatedOrder(order, offerId))
+    }
+
+    async sendUpdatedOrder(order, offerId) {
+        this.displayMessage("");
+        try {
+            const section = this.#centerArticle.querySelector("section.buyer-display");
+
+            const orderDTO = structuredClone(order)
+            const paymentInput = section.querySelector("input.date.payment").value.trim()
+            orderDTO.payed = paymentInput ? Date.parse(paymentInput) : null;
+            const departureInput = section.querySelector("input.date.departure").value.trim()
+            orderDTO.departed = departureInput ? Date.parse(departureInput) : null;
+            orderDTO.trackingReference = section.querySelector("input.tracking").value.trim() || null;
+
+            const headers = {"Content-Type": "application/json", "Accept": "text/plain"};
+            const response = await fetch("/services/orders?offerReference=" + offerId, {
+                method: "POST", headers: headers, body: JSON.stringify(orderDTO), credentials: "include"
+            });
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+
+        } catch (error) {
+            this.displayMessage(error)
+        }
     }
 
 }
