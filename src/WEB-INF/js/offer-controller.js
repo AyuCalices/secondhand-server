@@ -112,7 +112,9 @@ class OfferController extends Controller {
         });
         if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
-        return await response.json();
+        const offers = await response.json();
+        offers.sort((a, b) => b.created - a.created);
+        return offers;
     }
 
     async sendCreatedOrUpdatedOffer(offer) {
