@@ -226,6 +226,90 @@
 			</section>
 		</template>
 
+		<template class="buyer-display">
+			<section class="buyer-display">
+				<fieldset>
+					<legend>Buyer</legend>
+					<div class="personal">
+						<div>
+							<label class="horizontal">Email</label>
+							<input class="email personal" type="email" maxlength="127" disabled />
+						</div>
+						<div>
+							<label class="horizontal">Title</label>
+							<input class="title personal" type="text" maxlength="15" disabled />
+						</div>
+						<div>
+							<label class="horizontal">Forename</label>
+							<input class="forename personal" type="text" maxlength="31" disabled />
+						</div>
+						<div>
+							<label class="horizontal">Surname</label>
+							<input class="surname personal" type="text" maxlength="31" disabled />
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Address</legend>
+					<div class="address">
+						<div>
+							<label class="horizontal">Street</label>
+							<input class="street address" type="text" maxlength="63" disabled />
+						</div>
+						<div>
+							<label class="horizontal">ZIP</label>
+							<input class="postcode address" type="text" maxlength="15" disabled />
+							<label>City</label>
+							<input class="city address" type="text" maxlength="63" disabled />
+						</div>
+						<div>
+							<label class="horizontal">Country</label>
+							<input class="country address" type="text" maxlength="63" disabled />
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Account</legend>
+					<div class="account">
+						<div>
+							<label class="horizontal">BIC</label>
+							<input class="bic account" type="text" maxlength="11" disabled />
+						</div>
+						<div>
+							<label class="horizontal">IBAN</label>
+							<input class="iban account" type="text" maxlength="32" disabled />
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Phones</legend>
+					<div class="phones"></div>
+				</fieldset>
+				<fieldset>
+					<legend>Order</legend>
+					<div class="order-dates">
+					<div>
+						<label class="horizontal">Date of Purchase</label>
+						<input class="date purchase order" type="date" maxlength="32" disabled />
+					</div>
+					<div>
+						<label class="horizontal">Date of Payment</label>
+						<input class="date payment order" type="date" maxlength="32" />
+					</div>
+					<div>
+						<label class="horizontal">Date of Departure</label>
+						<input class="date departure order" type="date" maxlength="32" />
+					</div>
+					<div>
+						<label class="horizontal">Tracking Reference</label>
+						<input class="tracking order" type="text" maxlength="32" />
+					</div>
+					</div>
+				</fieldset>
+				<button class="send" type="button" title="flush account and address changes">send</button>
+			</section>
+		</template>
+
 		<template class="own-orders">
 			<section class="own-orders">
 				<fieldset>

@@ -8,7 +8,7 @@ import xhr from "./xhr.js"
  */
 class OfferController extends Controller {
     #centerArticle;
-    #editSection;
+    #interactiveSection;
 
     // used to store the avatarReference when an image is being uploaded
     // before an offer is created and therefore can be linked to that avatar
@@ -20,7 +20,7 @@ class OfferController extends Controller {
     constructor () {
         super();
         this.#centerArticle = document.querySelector("main article.center");
-        this.#editSection, this.#reservedAvatarReference = null;
+        this.#interactiveSection, this.#reservedAvatarReference = null;
     }
 
     /*
@@ -28,7 +28,7 @@ class OfferController extends Controller {
      */
     async activate () {
         this.clearChildren(this.#centerArticle);
-        this.#editSection = null;
+        this.#interactiveSection = null;
 
         const offers = await this.getOffers();
 
@@ -37,7 +37,7 @@ class OfferController extends Controller {
         this.#centerArticle.append(sectionOwnOffers);
 
         const newButton = sectionOwnOffers.querySelector("button.new");
-        newButton.addEventListener('click', () => this.displayEditSection(null));
+        newButton.addEventListener('click', () => this.displayOfferInInteractiveSection(null));
 
         this.updateOffersSection(offers)
     }
@@ -55,9 +55,12 @@ class OfferController extends Controller {
             const rowCells = sectionOffersTableRow.querySelectorAll("td");
             const rowImages = sectionOffersTableRow.querySelectorAll("img");
             rowImages[0].src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
-            rowImages[0].addEventListener('click', event => this.displayEditSection(offer));
+            rowImages[0].addEventListener('click', event => this.displayOfferInInteractiveSection(offer));
 
-            if (offer.buyerReference) rowImages[1].src = "/services/people/" + offer.buyerReference + "/avatar" + "?cache-bust=" + Date.now();
+            if (offer.buyerReference) {
+                rowImages[1].src = "/services/people/" + offer.buyerReference + "/avatar" + "?cache-bust=" + Date.now();
+                rowImages[1].addEventListener('click', event => this.displayBuyerAndOrderInInteractiveSection(offer.buyerReference, offer.identity));
+            }
 
             rowCells[2].append(offer.article.category);
             rowCells[3].append(offer.article.brand);
@@ -68,16 +71,16 @@ class OfferController extends Controller {
         }
     }
 
-    displayEditSection(offer) {
-        if (this.#editSection) this.removeEditSection();
+    displayOfferInInteractiveSection(offer) {
+        if (this.#interactiveSection) this.removeInteractiveSection();
 
         const templateOwnOffer = document.querySelector("head template.own-offer");
         const sectionOwnOffer = templateOwnOffer.content.cloneNode(true).firstElementChild;
         this.#centerArticle.append(sectionOwnOffer);
-        this.#editSection = sectionOwnOffer;
+        this.#interactiveSection = sectionOwnOffer;
 
         const cancelButton = sectionOwnOffer.querySelector("button.cancel");
-        cancelButton.addEventListener('click', event => this.removeEditSection());
+        cancelButton.addEventListener('click', event => this.removeInteractiveSection());
         const createOrUpdateButton = sectionOwnOffer.querySelector("button.create-or-update");
         createOrUpdateButton.addEventListener('click', event => this.sendCreatedOrUpdatedOffer(offer));
 
@@ -100,21 +103,26 @@ class OfferController extends Controller {
         sectionOwnOffer.querySelector("input.postage.article.numeric").value = (offer.postage * 0.01).toFixed(2);
     }
 
-    removeEditSection() {
-        this.#centerArticle.removeChild(this.#editSection);
-        this.#editSection, this.#reservedAvatarReference = null;
+    removeInteractiveSection() {
+        this.#centerArticle.removeChild(this.#interactiveSection);
+        this.#interactiveSection, this.#reservedAvatarReference = null;
     }
 
     async getOffers() {
-        const headers = {"Content-Type": "application/json", "Accept" : "application/json"};
-        const response = await fetch("/services/people/" + Controller.sessionOwner.identity + "/offers", {
-            method: "GET", headers: headers, credentials: "include"
-        });
-        if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+        this.displayMessage("")
+        try {
+            const headers = {"Content-Type": "application/json", "Accept" : "application/json"};
+            const response = await fetch("/services/people/" + Controller.sessionOwner.identity + "/offers", {
+                method: "GET", headers: headers, credentials: "include"
+            });
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
-        const offers = await response.json();
-        offers.sort((a, b) => b.created - a.created);
-        return offers;
+            const offers = await response.json();
+            offers.sort((a, b) => b.created - a.created);
+            return offers;
+        } catch (error) {
+            this.displayMessage(error);
+        }
     }
 
     async sendCreatedOrUpdatedOffer(offer) {
@@ -177,8 +185,77 @@ class OfferController extends Controller {
         }
     }
 
-}
+    async getBuyer(buyerId) {
+        this.displayMessage("")
+        try {
+            const headers = {"Content-Type": "application/json", "Accept": "application/json"};
+            const response = await fetch("/services/people/" + buyerId, {
+                method: "GET", headers: headers, credentials: "include"
+            });
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
+            return await response.json();
+        } catch (error) {
+            this.displayMessage(error);
+        }
+    }
+
+    async getOrder(offerId) {
+        this.displayMessage("")
+        try {
+            const headers = {"Content-Type": "application/json", "Accept": "application/json"};
+            const response = await fetch("/services/offers/" + offerId + "/order", {
+                method: "GET", headers: headers, credentials: "include"
+            });
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+
+            return await response.json();
+        } catch (error) {
+            this.displayMessage(error);
+        }
+    }
+
+    async displayBuyerAndOrderInInteractiveSection(buyerId, offerId) {
+        if (this.#interactiveSection) this.removeInteractiveSection();
+
+        const buyer = await this.getBuyer(buyerId);
+        const templateBuyerInfo = document.querySelector("head template.buyer-display");
+        const sectionBuyerInfo = templateBuyerInfo.content.cloneNode(true).firstElementChild;
+        this.#centerArticle.append(sectionBuyerInfo);
+        this.#interactiveSection = sectionBuyerInfo;
+
+        sectionBuyerInfo.querySelector("input.email.personal").value = buyer.email;
+        sectionBuyerInfo.querySelector("input.title.personal").value = buyer.name.title;
+        sectionBuyerInfo.querySelector("input.forename.personal").value = buyer.name.given;
+        sectionBuyerInfo.querySelector("input.surname.personal").value = buyer.name.family;
+
+        sectionBuyerInfo.querySelector("input.street.address").value = buyer.address.street;
+        sectionBuyerInfo.querySelector("input.postcode.address").value = buyer.address.postcode;
+        sectionBuyerInfo.querySelector("input.city.address").value = buyer.address.city;
+        sectionBuyerInfo.querySelector("input.country.address").value = buyer.address.country;
+
+        sectionBuyerInfo.querySelector("input.bic.account").value = buyer.account.bic;
+        sectionBuyerInfo.querySelector("input.iban.account").value = buyer.account.iban;
+
+        for (const phone of buyer.phones) {
+            const phonesDiv = sectionBuyerInfo.querySelector("div.phones");
+            const phoneDiv = document.createElement("div");
+            const phoneInput = document.createElement("input");
+            phoneInput.type = "text";
+            phoneInput.value = phone;
+            phoneInput.disabled = true
+            phoneDiv.append(phoneInput);
+            phonesDiv.append(phoneDiv);
+        }
+
+        const order = await this.getOrder(offerId);
+        sectionBuyerInfo.querySelector("input.date.order").value = new Date(order.created).toISOString().split('T')[0];
+        sectionBuyerInfo.querySelector("input.date.payment").value = new Date(order.payed).toISOString().split('T')[0];
+        sectionBuyerInfo.querySelector("input.date.departure").value = new Date(order.departed).toISOString().split('T')[0];
+        sectionBuyerInfo.querySelector("input.tracking.order").value = order.trackingReference;
+    }
+
+}
 
 /*
  * Performs controller event listener registration during load event handling.

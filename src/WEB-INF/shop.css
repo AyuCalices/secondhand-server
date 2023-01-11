@@ -209,6 +209,27 @@ section.available-offer img.avatar {
 	width: 10em;
 }
 
+section.buyer-display label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 9em;
+}
+
+section.buyer-display input.address, section.buyer-display input.account {
+	width: 16.5em;
+}
+
+section.buyer-display input.city {
+	width: 10.5em;
+}
+
+section.buyer-display input.postcode {
+	width: 3em;
+}
+
+.order-dates div {
+	margin-bottom: 10px;
+}
 
 section.shopping-cart fieldset div.row {
 	display: flex;
