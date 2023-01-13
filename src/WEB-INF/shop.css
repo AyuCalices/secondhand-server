@@ -251,3 +251,35 @@ section.shopping-cart img.avatar {
 	height: 10em;
 	width: 10em;
 }
+
+
+
+section.own-orders label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5.5em;
+}
+
+section.own-orders img.avatar {
+	vertical-align: middle;
+	height: 5em;
+	width: 5em;
+}
+
+section.seller-display img.avatar {
+	vertical-align: middle;
+	height: 10em;
+	width: 10em;
+}
+
+section.seller-display label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 9em;
+}
+
+section.offer-display label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 9em;
+}

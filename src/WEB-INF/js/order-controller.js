@@ -47,15 +47,15 @@ class OrderController extends Controller {
         this.clearChildren(tableBody);
 
         for (const order of orders) {
-            const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
-            tableBody.append(sectionOffersTableRow)
-
-            const rowCells = sectionOffersTableRow.querySelectorAll("td");
-            const rowImages = sectionOffersTableRow.querySelectorAll("img");
-
             const orderSeller = await this.getOrderSeller(order.identity);
             const offers = await this.getOrderOffers(order.identity);
             if (orderSeller != null && offers != null) {
+                const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
+                tableBody.append(sectionOffersTableRow)
+
+                const rowCells = sectionOffersTableRow.querySelectorAll("td");
+                const rowImages = sectionOffersTableRow.querySelectorAll("img");
+
                 rowImages[0].src = "/services/people/" + orderSeller.identity + "/avatar" + "?cache-bust=" + Date.now();
                 rowImages[0].addEventListener('click', event => {
                     this.removeInteractiveSection();
@@ -93,32 +93,32 @@ class OrderController extends Controller {
         this.#interactiveSellerSection = sectionSellerInfo;
 
         sectionSellerInfo.querySelector("img.avatar").src = "/services/people/" + seller.identity + "/avatar" + "?cache-bust=" + Date.now();
-        sectionSellerInfo.querySelector("output.name").value = seller.name.given + " " + seller.name.family;
-        sectionSellerInfo.querySelector("output.email").value = seller.email;
-        sectionSellerInfo.querySelector("output.street").value = seller.address.street;
 
-        sectionSellerInfo.querySelector("output.city").value = seller.address.postcode + " " + seller.address.city;
-        sectionSellerInfo.querySelector("output.country").value = seller.address.country;
-        sectionSellerInfo.querySelector("output.bic").value = seller.account.bic;
-        sectionSellerInfo.querySelector("output.iban").value = seller.account.iban;
+        sectionSellerInfo.querySelector("input.name").value = seller.name.given + " " + seller.name.family;
+        sectionSellerInfo.querySelector("input.email").value = seller.email;
+        sectionSellerInfo.querySelector("input.street").value = seller.address.street;
+
+        sectionSellerInfo.querySelector("input.city").value = seller.address.postcode + " " + seller.address.city;
+        sectionSellerInfo.querySelector("input.country").value = seller.address.country;
+        sectionSellerInfo.querySelector("input.bic").value = seller.account.bic;
+        sectionSellerInfo.querySelector("input.iban").value = seller.account.iban;
     }
 
     async displaySellerOffers(offers) {
         const templateOffersInfo = document.querySelector("head template.offer-display");
         const sectionOffersInfo = templateOffersInfo.content.cloneNode(true).firstElementChild;
 
-        console.log(offers);
         for (const offer of offers) {
             this.#interactiveSellerSection.append(sectionOffersInfo);
 
             sectionOffersInfo.querySelector("img.avatar").src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
-            sectionOffersInfo.querySelector("output.category").value = offer.article.category;
-            sectionOffersInfo.querySelector("output.item").value = offer.article.alias;
+            sectionOffersInfo.querySelector("input.category").value = offer.article.category;
+            sectionOffersInfo.querySelector("input.item").value = offer.article.alias;
             sectionOffersInfo.querySelector("textarea.description").value = offer.article.description;
 
-            sectionOffersInfo.querySelector("output.serial").value = offer.serial;
-            sectionOffersInfo.querySelector("output.price").value = offer.price;
-            sectionOffersInfo.querySelector("output.postage").value = offer.postage;
+            sectionOffersInfo.querySelector("input.serial").value = offer.serial;
+            sectionOffersInfo.querySelector("input.price").value = offer.price;
+            sectionOffersInfo.querySelector("input.postage").value = offer.postage;
         }
     }
 

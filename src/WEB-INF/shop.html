@@ -322,7 +322,6 @@
 								<th class="numeric">Postage</th>
 								<th class="numeric">Total</th>
 								<th>Status</th>
-								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody></tbody>
@@ -338,7 +337,6 @@
 				<td class="numeric"></td>
 				<td class="numeric"></td>
 				<td></td>
-				<td></td>
 			</tr>
 		</template>
 
@@ -352,73 +350,86 @@
 		</template>
 
 		<template class="seller-display">
-			<div class="seller-display">
-				<div>
-					<label class="horizontal"></label>
-					<img class="avatar" />
-				</div>
-				<div>
-					<label class="horizontal">Seller</label>
-					<output class="name"></output>
-				</div>
-				<div>
-					<label class="horizontal">Email</label>
-					<output class="email"></output>
-				</div>
-				<div>
-					<label class="horizontal">Address</label>
-					<output class="street"></output>
-				</div>
-				<div>
-					<label class="horizontal"></label>
-					<output class="city"></output>
-				</div>
-				<div>
-					<label class="horizontal"></label>
-					<output class="country"></output>
-				</div>
-				<div>
-					<label class="horizontal">BIC</label>
-					<output class="bic"></output>
-				</div>
-				<div>
-					<label class="horizontal">IBAN</label>
-					<output class="iban"></output>
-				</div>
-			</div>
+			<section class="seller-display">
+				<fieldset>
+					<legend>Avatar</legend>
+					<div class="avatar">
+						<label class="horizontal">Drop image to change</label>
+						<img class="avatar" ondragover="event.preventDefault()" ondrop="event.preventDefault()" />
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Sellers</legend>
+					<div class="seller-display">
+						<div>
+							<label class="horizontal">Seller</label>
+							<input class="name" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Email</label>
+							<input class="email" type="email" disabled></input>
+						</div>
+						<div>
+							<label class="horizontal">Address</label>
+							<input class="street" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal"></label>
+							<input class="city" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal"></label>
+							<input class="country" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">BIC</label>
+							<input class="bic" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">IBAN</label>
+							<input class="iban" type="text" disabled>
+						</div>
+					</div>
+				</fieldset>
+			</section>
 		</template>
 
 		<template class="offer-display">
-			<div class="offer-display">
-				<div>
-					<label class="horizontal"></label>
-					<img class="avatar" />
-				</div>
-				<div>
-					<label class="horizontal">Category</label>
-					<output class="category"></output>
-				</div>
-				<div>
-					<label class="horizontal">Item</label>
-					<output class="item"></output>
-				</div>
-				<div>
-					<label class="horizontal">Description</label>
-					<textarea class="description" readonly="true"></textarea>
-				</div>
-				<div>
-					<label class="horizontal">Serial</label>
-					<output class="serial"></output>
-				</div>
-				<div>
-					<label class="horizontal">Price</label>
-					<output class="price"></output>
-				</div>
-				<div>
-					<label class="horizontal">Postage</label>
-					<output class="postage"></output>
-				</div>
-			</div>
+			<section class="seller-display">
+				<fieldset>
+					<legend>Offers</legend>
+					<div class="offer-display">
+						<div>
+							<label class="horizontal"></label>
+							<img class="avatar" />
+						</div>
+						<div>
+							<label class="horizontal">Category</label>
+							<input class="category" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Item</label>
+							<input class="item" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Description</label>
+							<textarea class="description" readonly="true" disabled></textarea>
+						</div>
+						<div>
+							<label class="horizontal">Serial</label>
+							<input class="serial" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Price</label>
+							<input class="price" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Postage</label>
+							<input class="postage" type="text" disabled>
+						</div>
+					</div>
+				</fieldset>
+			</section>
 		</template>
 
 		<template class="order-display">
