@@ -117,8 +117,8 @@ class OrderController extends Controller {
             sectionOffersInfo.querySelector("textarea.description").value = offer.article.description;
 
             sectionOffersInfo.querySelector("input.serial").value = offer.serial;
-            sectionOffersInfo.querySelector("input.price").value = offer.price;
-            sectionOffersInfo.querySelector("input.postage").value = offer.postage;
+            sectionOffersInfo.querySelector("input.price").value = (offer.price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €";
+            sectionOffersInfo.querySelector("input.postage").value = (offer.postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €"
         }
     }
 

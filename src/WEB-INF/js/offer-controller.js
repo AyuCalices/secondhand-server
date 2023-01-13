@@ -30,8 +30,6 @@ class OfferController extends Controller {
         this.clearChildren(this.#centerArticle);
         this.#interactiveSection = null;
 
-        const offers = await this.getOffers();
-
         const templateOwnOffers = document.querySelector("head template.own-offers");
         const sectionOwnOffers = templateOwnOffers.content.cloneNode(true).firstElementChild;
         this.#centerArticle.append(sectionOwnOffers);
@@ -39,7 +37,8 @@ class OfferController extends Controller {
         const newButton = sectionOwnOffers.querySelector("button.new");
         newButton.addEventListener('click', () => this.displayOfferInInteractiveSection(null));
 
-        this.updateOffersSection(offers)
+        const offers = await this.queryOffers();
+        this.updateOffersSection(offers);
     }
 
     updateOffersSection(offers) {
@@ -65,9 +64,9 @@ class OfferController extends Controller {
             rowCells[2].append(offer.article.category);
             rowCells[3].append(offer.article.brand);
             rowCells[4].append(offer.article.alias);
-            if (offer.serial) rowCells[5].append(offer.serial);
-            rowCells[6].append((offer.price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
-            rowCells[7].append((offer.postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
+            rowCells[5].append(offer.serial || "-");
+            rowCells[6].append((offer.price * 0.01).toFixed(2));
+            rowCells[7].append((offer.postage * 0.01).toFixed(2));
         }
     }
 
@@ -98,7 +97,7 @@ class OfferController extends Controller {
         sectionOwnOffer.querySelector("input.brand.article").value = offer.article.brand;
         sectionOwnOffer.querySelector("input.name.article").value = offer.article.alias;
         sectionOwnOffer.querySelector("textarea.description.article").value = offer.article.description;
-        sectionOwnOffer.querySelector("input.serial.article").value = offer.serial;
+        sectionOwnOffer.querySelector("input.serial.article").value = offer.serial || "";
         sectionOwnOffer.querySelector("input.price.article.numeric").value = (offer.price * 0.01).toFixed(2);
         sectionOwnOffer.querySelector("input.postage.article.numeric").value = (offer.postage * 0.01).toFixed(2);
     }
@@ -108,7 +107,7 @@ class OfferController extends Controller {
         this.#interactiveSection, this.#reservedAvatarReference = null;
     }
 
-    async getOffers() {
+    async queryOffers() {
         this.displayMessage("")
         try {
             const headers = {"Content-Type": "application/json", "Accept" : "application/json"};
@@ -130,26 +129,28 @@ class OfferController extends Controller {
         try {
             const section = this.#centerArticle.querySelector("section.own-offer");
 
-            const offerDTO = offer != null ? structuredClone(offer) : {};
+            const offerDTO = offer != null ? structuredClone(offer) : {identity: 0, version: 1};
             if (offer == null) offerDTO.article = {};
 
-            offerDTO.article.category = section.querySelector("select.category.article").value.trim();
-            offerDTO.article.brand = section.querySelector("input.brand.article").value.trim();
-            offerDTO.article.alias = section.querySelector("input.name.article").value.trim();
-            offerDTO.article.description = section.querySelector("textarea.description.article").value.trim();
-            offerDTO.serial = section.querySelector("input.serial.article").value.trim() || null;
-            offerDTO.price = Math.floor(parseFloat(section.querySelector("input.price.article.numeric").value) * 100);
-            offerDTO.postage = Math.floor(parseFloat(section.querySelector("input.postage.article.numeric").value) * 100);
+            offerDTO.article.category = section.querySelector("select.category").value.trim();
+            offerDTO.article.brand = section.querySelector("input.brand").value.trim();
+            offerDTO.article.alias = section.querySelector("input.name").value.trim();
+            offerDTO.article.description = section.querySelector("textarea.description").value.trim();
+            offerDTO.serial = section.querySelector("input.serial").value.trim() || null;
+            offerDTO.price = Math.floor(parseFloat(section.querySelector("input.price").value) * 100);
+            offerDTO.postage = Math.floor(parseFloat(section.querySelector("input.postage").value) * 100);
 
             const headers = {"Content-Type": "application/json", "Accept" : "text/plain"};
-            const requestUrlPath = this.#reservedAvatarReference != null ? "/services/offers?avatarReference=" + this.#reservedAvatarReference : "/services/offers";
+            const requestUrlPath = this.#reservedAvatarReference != null ?
+                "/services/offers?avatarReference=" + this.#reservedAvatarReference :
+                "/services/offers";
             const response = await fetch(requestUrlPath, {
                 method: "POST", headers: headers, body: JSON.stringify(offerDTO), credentials: "include"
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
             this.#reservedAvatarReference = null;
 
-            const offers = await this.getOffers();
+            const offers = await this.queryOffers();
             this.updateOffersSection(offers);
         } catch (error) {
             this.displayMessage(error)
@@ -177,14 +178,15 @@ class OfferController extends Controller {
                     method: "POST", credentials: "include", headers: headers, body: JSON.stringify(offer)
                 });
                 if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+
+                avatarImage.src = "/services/documents/" + avatarReference + "?cache-bust=" + Date.now();
             }
-            avatarImage.src = "/services/documents/" + avatarReference + "?cache-bust=" + Date.now();
         } catch (error) {
             this.displayMessage(error);
         }
     }
 
-    async getBuyer(buyerId) {
+    async queryBuyer(buyerId) {
         this.displayMessage("")
         try {
             const headers = {"Content-Type": "application/json", "Accept": "application/json"};
@@ -199,7 +201,7 @@ class OfferController extends Controller {
         }
     }
 
-    async getOrder(offerId) {
+    async queryOrder(offerId) {
         this.displayMessage("")
         try {
             const headers = {"Content-Type": "application/json", "Accept": "application/json"};
@@ -217,7 +219,7 @@ class OfferController extends Controller {
     async displayBuyerAndOrderInInteractiveSection(buyerId, offerId) {
         if (this.#interactiveSection) this.removeInteractiveSection();
 
-        const buyer = await this.getBuyer(buyerId);
+        const buyer = await this.queryBuyer(buyerId);
         const templateBuyerInfo = document.querySelector("head template.buyer-display");
         const sectionBuyerInfo = templateBuyerInfo.content.cloneNode(true).firstElementChild;
         this.#centerArticle.append(sectionBuyerInfo);
@@ -247,16 +249,16 @@ class OfferController extends Controller {
             phonesDiv.append(phoneDiv);
         }
 
-        const order = await this.getOrder(offerId);
+        const order = await this.queryOrder(offerId);
         sectionBuyerInfo.querySelector("input.date.order").value = new Date(order.created).toISOString().split('T')[0];
         sectionBuyerInfo.querySelector("input.date.payment").value = new Date(order.payed).toISOString().split('T')[0];
         sectionBuyerInfo.querySelector("input.date.departure").value = new Date(order.departed).toISOString().split('T')[0];
         sectionBuyerInfo.querySelector("input.tracking.order").value = order.trackingReference;
 
-        sectionBuyerInfo.querySelector("button.update").addEventListener('click', event => this.sendUpdatedOrder(order, offerId))
+        sectionBuyerInfo.querySelector("button.update").addEventListener('click', event => this.sendUpdatedOrder(order));
     }
 
-    async sendUpdatedOrder(order, offerId) {
+    async sendUpdatedOrder(order) {
         this.displayMessage("");
         try {
             const section = this.#centerArticle.querySelector("section.buyer-display");
@@ -269,16 +271,14 @@ class OfferController extends Controller {
             orderDTO.trackingReference = section.querySelector("input.tracking").value.trim() || null;
 
             const headers = {"Content-Type": "application/json", "Accept": "text/plain"};
-            const response = await fetch("/services/orders?offerReference=" + offerId, {
+            const response = await fetch("/services/orders", {
                 method: "POST", headers: headers, body: JSON.stringify(orderDTO), credentials: "include"
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
-
         } catch (error) {
             this.displayMessage(error)
         }
     }
-
 }
 
 /*
