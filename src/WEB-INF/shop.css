@@ -283,3 +283,15 @@ section.offer-display label.horizontal {
 	margin: 0em 0em 0.1em 0em;
 	width: 9em;
 }
+
+section.offer-display-table label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5.5em;
+}
+
+section.offer-display-table img.avatar {
+	vertical-align: middle;
+	height: 5em;
+	width: 5em;
+}

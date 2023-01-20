@@ -63,18 +63,16 @@ class OrderController extends Controller {
                     this.displaySellerOffers(offers);
                 });
 
-                let alias = "";
                 let postage = 0;
                 let price = 0;
 
                 for (const offer of offers) {
-                    alias += " " + offer.article.alias;
                     postage = Math.max(postage, offer.postage);
                     price += offer.price;
                 }
-                rowCells[1].append(alias);
-                rowCells[2].append((postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
-                rowCells[3].append((price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
+                rowCells[1].append((postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
+                rowCells[2].append((price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
+                rowCells[3].append(((price + postage) * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
             }
         }
     }
@@ -105,20 +103,27 @@ class OrderController extends Controller {
     }
 
     async displaySellerOffers(offers) {
-        const templateOffersInfo = document.querySelector("head template.offer-display");
-        const sectionOffersInfo = templateOffersInfo.content.cloneNode(true).firstElementChild;
+        const templateOffersTable = document.querySelector("head template.offer-display-table");
+        const sectionOffersTable = templateOffersTable.content.cloneNode(true).firstElementChild;
+        this.#interactiveSellerSection.append(sectionOffersTable);
+
+        const offersTable = this.#centerArticle.querySelector("section.offer-display-table table.offers");
+        const tableBody = offersTable.querySelector("tbody");
+        const templateOffersTableRow = document.querySelector("head template.offer-display-table-row");
+        const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
 
         for (const offer of offers) {
-            this.#interactiveSellerSection.append(sectionOffersInfo);
+            tableBody.append(sectionOffersTableRow);
 
-            sectionOffersInfo.querySelector("img.avatar").src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
-            sectionOffersInfo.querySelector("input.category").value = offer.article.category;
-            sectionOffersInfo.querySelector("input.item").value = offer.article.alias;
-            sectionOffersInfo.querySelector("textarea.description").value = offer.article.description;
+            const rowCells = sectionOffersTableRow.querySelectorAll("td");
+            const rowImages = sectionOffersTableRow.querySelectorAll("img");
 
-            sectionOffersInfo.querySelector("input.serial").value = offer.serial;
-            sectionOffersInfo.querySelector("input.price").value = (offer.price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €";
-            sectionOffersInfo.querySelector("input.postage").value = (offer.postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €"
+            rowImages[0].src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
+            rowCells[1].append(offer.article.category);
+            rowCells[2].append(offer.article.alias);
+            rowCells[3].append(offer.serial);
+            rowCells[4].append((offer.price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
+            rowCells[5].append((offer.postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
         }
     }
 

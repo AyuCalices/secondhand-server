@@ -318,10 +318,9 @@
 						<thead>
 							<tr>
 								<th>Seller</th>
-								<th>Offer Items</th>
+								<th class="numeric">Price Sum</th>
 								<th class="numeric">Postage</th>
 								<th class="numeric">Total</th>
-								<th>Status</th>
 							</tr>
 						</thead>
 						<tbody></tbody>
@@ -392,6 +391,38 @@
 					</div>
 				</fieldset>
 			</section>
+		</template>
+
+		<template class="offer-display-table">
+			<section class="offer-display-table">
+				<fieldset>
+					<legend>Your Orders</legend>
+					<table class="offers">
+						<thead>
+						<tr>
+							<th>Image</th>
+							<th>Category</th>
+							<th>Item</th>
+							<th>Serial</th>
+							<th class="numeric">Price</th>
+							<th class="numeric">Postage</th>
+						</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</fieldset>
+			</section>
+		</template>
+
+		<template class="offer-display-table-row">
+			<tr class="offer-display-table-row">
+				<td><img class="avatar" /></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td class="numeric"></td>
+				<td class="numeric"></td>
+			</tr>
 		</template>
 
 		<template class="offer-display">
