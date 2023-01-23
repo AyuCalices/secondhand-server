@@ -56,6 +56,10 @@ label.horizontal {
 	vertical-align: middle;
 }
 
+table {
+	border-spacing: 20px 5px;
+}
+
 td.numeric, th.numeric, input.numeric {
 	text-align: end;
 }
@@ -205,6 +209,27 @@ section.available-offer img.avatar {
 	width: 10em;
 }
 
+section.buyer-display label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 9em;
+}
+
+section.buyer-display input.address, section.buyer-display input.account {
+	width: 16.5em;
+}
+
+section.buyer-display input.city {
+	width: 10.5em;
+}
+
+section.buyer-display input.postcode {
+	width: 3em;
+}
+
+.order-dates div {
+	margin-bottom: 10px;
+}
 
 section.shopping-cart fieldset div.row {
 	display: flex;
@@ -225,4 +250,48 @@ section.shopping-cart img.avatar {
 	vertical-align: middle;
 	height: 10em;
 	width: 10em;
+}
+
+
+
+section.own-orders label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5.5em;
+}
+
+section.own-orders img.avatar {
+	vertical-align: middle;
+	height: 5em;
+	width: 5em;
+}
+
+section.seller-display img.avatar {
+	vertical-align: middle;
+	height: 10em;
+	width: 10em;
+}
+
+section.seller-display label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 9em;
+}
+
+section.offer-display label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 9em;
+}
+
+section.offer-display-table label.horizontal {
+	text-align: right;
+	margin: 0em 0em 0.1em 0em;
+	width: 5.5em;
+}
+
+section.offer-display-table img.avatar {
+	vertical-align: middle;
+	height: 5em;
+	width: 5em;
 }

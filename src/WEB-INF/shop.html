@@ -1,5 +1,5 @@
 <!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="author" content="Sascha Baumeister" />
@@ -24,11 +24,13 @@
 					<legend>Login</legend>
 					<div>
 						<label class="horizontal">Email</label>
-						<input class="email" type="email" maxlength="128" />
+<!--						TODO: revert email field -->
+						<input class="email" type="email" maxlength="128" value="julia.fischer@web.de" />
 					</div>
 					<div>
 						<label class="horizontal">Password</label>
-						<input class="password" type="password" maxlength="32" />
+<!--						TODO: revert password field -->
+						<input class="password" type="password" maxlength="32" value="julia" />
 					</div>
 				</fieldset>
 				<button class="login" type="button" title="perform authentication">login</button>
@@ -122,12 +124,13 @@
 						<thead>
 							<tr>
 								<th>Avatar</th>
+								<th>Buyer</th>
+								<th>Category</th>
 								<th>Brand</th>
 								<th>Name</th>
-								<th>Available</th>
-								<th class="numeric">Price</th>
-								<th class="numeric">Postage</th>
-								<th>Action</th>
+								<th>Serial</th>
+								<th class="numeric">Price (€)</th>
+								<th class="numeric">Postage (€)</th>
 							</tr>
 						</thead>
 						<tbody></tbody>
@@ -140,12 +143,13 @@
 		<template class="own-offer-table-row">
 			<tr class="own-offer-table-row">
 				<td><img class="avatar" /></td>
+				<td><img class="avatar" src="not_available.jpeg" /></td>
 				<td></td>
 				<td></td>
-				<td><input class="available" type="checkbox" disabled="true" /></td>
+				<td></td>
+				<td></td>
 				<td class="numeric"></td>
 				<td class="numeric"></td>
-				<td></td>
 			</tr>
 		</template>
 
@@ -163,7 +167,28 @@
 					<div class="article">
 						<div>
 							<label class="horizontal">Category</label>
-							<input class="category article" type="text" maxlength="16" />
+							<select class="category article">
+								<option value="ART">ART</option>
+								<option value="AUDIO">AUDIO</option>
+								<option value="BEAUTY">BEAUTY</option>
+								<option value="COLLECTIBLE">COLLECTIBLE</option>
+								<option value="COMPUTER">COMPUTER</option>
+								<option value="CRAFT">CRAFT</option>
+								<option value="DOMESTIC">DOMESTIC</option>
+								<option value="GARDEN">GARDEN</option>
+								<option value="GOURMET">GOURMET</option>
+								<option value="HANDICRAFT">HANDICRAFT</option>
+								<option value="HEALTH">HEALTH</option>
+								<option value="IMAGE">IMAGE</option>
+								<option value="INDUSTRIAL">INDUSTRIAL</option>
+								<option value="INFANT">INFANT</option>
+								<option value="PET">PET</option>
+								<option value="PHONE">PHONE</option>
+								<option value="STATIONERY">STATIONERY</option>
+								<option value="TOY">TOY</option>
+								<option value="VEHICLE">VEHICLE</option>
+								<option value="VIDEO">VIDEO</option>
+							</select>
 						</div>
 						<div>
 							<label class="horizontal">Brand</label>
@@ -201,6 +226,90 @@
 			</section>
 		</template>
 
+		<template class="buyer-display">
+			<section class="buyer-display">
+				<fieldset>
+					<legend>Buyer</legend>
+					<div class="personal">
+						<div>
+							<label class="horizontal">Email</label>
+							<input class="email personal" type="email" maxlength="127" disabled />
+						</div>
+						<div>
+							<label class="horizontal">Title</label>
+							<input class="title personal" type="text" maxlength="15" disabled />
+						</div>
+						<div>
+							<label class="horizontal">Forename</label>
+							<input class="forename personal" type="text" maxlength="31" disabled />
+						</div>
+						<div>
+							<label class="horizontal">Surname</label>
+							<input class="surname personal" type="text" maxlength="31" disabled />
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Address</legend>
+					<div class="address">
+						<div>
+							<label class="horizontal">Street</label>
+							<input class="street address" type="text" maxlength="63" disabled />
+						</div>
+						<div>
+							<label class="horizontal">ZIP</label>
+							<input class="postcode address" type="text" maxlength="15" disabled />
+							<label>City</label>
+							<input class="city address" type="text" maxlength="63" disabled />
+						</div>
+						<div>
+							<label class="horizontal">Country</label>
+							<input class="country address" type="text" maxlength="63" disabled />
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Account</legend>
+					<div class="account">
+						<div>
+							<label class="horizontal">BIC</label>
+							<input class="bic account" type="text" maxlength="11" disabled />
+						</div>
+						<div>
+							<label class="horizontal">IBAN</label>
+							<input class="iban account" type="text" maxlength="32" disabled />
+						</div>
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Phones</legend>
+					<div class="phones"></div>
+				</fieldset>
+				<fieldset>
+					<legend>Order</legend>
+					<div class="order-dates">
+					<div>
+						<label class="horizontal">Date of Purchase</label>
+						<input class="date purchase order" type="date" maxlength="32" disabled />
+					</div>
+					<div>
+						<label class="horizontal">Date of Payment</label>
+						<input class="date payment order" type="date" maxlength="32" />
+					</div>
+					<div>
+						<label class="horizontal">Date of Departure</label>
+						<input class="date departure order" type="date" maxlength="32" />
+					</div>
+					<div>
+						<label class="horizontal">Tracking Reference</label>
+						<input class="tracking order" type="text" maxlength="32" />
+					</div>
+					</div>
+				</fieldset>
+				<button class="update" type="button">update</button>
+			</section>
+		</template>
+
 		<template class="own-orders">
 			<section class="own-orders">
 				<fieldset>
@@ -209,11 +318,9 @@
 						<thead>
 							<tr>
 								<th>Seller</th>
-								<th>Offer Items</th>
+								<th class="numeric">Price Sum</th>
 								<th class="numeric">Postage</th>
 								<th class="numeric">Total</th>
-								<th>Status</th>
-								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody></tbody>
@@ -224,11 +331,10 @@
 
 		<template class="own-order-table-row">
 			<tr class="own-order-table-row">
-				<td></td>
+				<td><img class="avatar" /></td>
 				<td></td>
 				<td class="numeric"></td>
 				<td class="numeric"></td>
-				<td></td>
 				<td></td>
 			</tr>
 		</template>
@@ -243,73 +349,118 @@
 		</template>
 
 		<template class="seller-display">
-			<div class="seller-display">
-				<div>
-					<label class="horizontal"></label>
-					<img class="avatar" />
-				</div>
-				<div>
-					<label class="horizontal">Seller</label>
-					<output class="name"></output>
-				</div>
-				<div>
-					<label class="horizontal">Email</label>
-					<output class="email"></output>
-				</div>
-				<div>
-					<label class="horizontal">Address</label>
-					<output class="street"></output>
-				</div>
-				<div>
-					<label class="horizontal"></label>
-					<output class="city"></output>
-				</div>
-				<div>
-					<label class="horizontal"></label>
-					<output class="country"></output>
-				</div>
-				<div>
-					<label class="horizontal">BIC</label>
-					<output class="bic"></output>
-				</div>
-				<div>
-					<label class="horizontal">IBAN</label>
-					<output class="iban"></output>
-				</div>
-			</div>
+			<section class="seller-display">
+				<fieldset>
+					<legend>Avatar</legend>
+					<div class="avatar">
+						<label class="horizontal">Drop image to change</label>
+						<img class="avatar" ondragover="event.preventDefault()" ondrop="event.preventDefault()" />
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>Sellers</legend>
+					<div class="seller-display">
+						<div>
+							<label class="horizontal">Seller</label>
+							<input class="name" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Email</label>
+							<input class="email" type="email" disabled></input>
+						</div>
+						<div>
+							<label class="horizontal">Address</label>
+							<input class="street" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal"></label>
+							<input class="city" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal"></label>
+							<input class="country" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">BIC</label>
+							<input class="bic" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">IBAN</label>
+							<input class="iban" type="text" disabled>
+						</div>
+					</div>
+				</fieldset>
+			</section>
+		</template>
+
+		<template class="offer-display-table">
+			<section class="offer-display-table">
+				<fieldset>
+					<legend>Your Orders</legend>
+					<table class="offers">
+						<thead>
+						<tr>
+							<th>Image</th>
+							<th>Category</th>
+							<th>Item</th>
+							<th>Serial</th>
+							<th class="numeric">Price</th>
+							<th class="numeric">Postage</th>
+						</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</fieldset>
+			</section>
+		</template>
+
+		<template class="offer-display-table-row">
+			<tr class="offer-display-table-row">
+				<td><img class="avatar" /></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td class="numeric"></td>
+				<td class="numeric"></td>
+			</tr>
 		</template>
 
 		<template class="offer-display">
-			<div class="offer-display">
-				<div>
-					<label class="horizontal"></label>
-					<img class="avatar" />
-				</div>
-				<div>
-					<label class="horizontal">Category</label>
-					<output class="category"></output>
-				</div>
-				<div>
-					<label class="horizontal">Item</label>
-					<output class="item"></output>
-				</div>
-				<div>
-					<label class="horizontal">Description</label>
-					<textarea class="description" readonly="true"></textarea>
-				</div>
-				<div>
-					<label class="horizontal">Serial</label>
-					<output class="serial"></output>
-				</div>
-				<div>
-					<label class="horizontal">Price</label>
-					<output class="price"></output>
-				</div>
-				<div>
-					<label class="horizontal">Postage</label>
-					<output class="postage"></output>
-				</div>
-			</div>
+			<section class="seller-display">
+				<fieldset>
+					<legend>Offers</legend>
+					<div class="offer-display">
+						<div>
+							<label class="horizontal"></label>
+							<img class="avatar" />
+						</div>
+						<div>
+							<label class="horizontal">Category</label>
+							<input class="category" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Item</label>
+							<input class="item" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Description</label>
+							<textarea class="description" readonly="true" disabled></textarea>
+						</div>
+						<div>
+							<label class="horizontal">Serial</label>
+							<input class="serial" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Price</label>
+							<input class="price" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Postage</label>
+							<input class="postage" type="text" disabled>
+						</div>
+					</div>
+				</fieldset>
+			</section>
 		</template>
 
 		<template class="order-display">
