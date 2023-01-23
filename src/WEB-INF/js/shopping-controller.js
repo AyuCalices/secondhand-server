@@ -34,8 +34,8 @@ class ShoppingController extends Controller {
         const sectionOfferQuery = templateOfferQuery.content.cloneNode(true).firstElementChild;
         this.#centerArticle.append(sectionOfferQuery);
 
-        // const searchButton = sectionOfferQuery.querySelector("button.search");
-        // searchButton.addEventListener('click', () => this.queryOffers());
+        const searchButton = sectionOfferQuery.querySelector("button.search");
+        searchButton.addEventListener('click', () => this.displayQueriedOffers());
 
         // const offers = await this.queryOffers();
         // this.updateOffersSection(offers);
@@ -107,54 +107,86 @@ class ShoppingController extends Controller {
         this.#interactiveSection, this.#reservedAvatarReference = null;
     }
 
-    async queryOffers() {
+    async queryOffers(queryParams) {
         this.displayMessage("")
         try {
-            const headers = {"Content-Type": "application/json", "Accept" : "application/json"};
-            const response = await fetch("/services/people/" + Controller.sessionOwner.identity + "/offers", {
+            const queryString = Object
+                .keys(queryParams)
+                .filter(key => queryParams[key] != null) // TODO: maybe don't even assign null values as you may want them to be sent in some cases
+                .map(key => key + '=' + queryParams[key])
+                .join('&');
+
+            const headers = {"Content-Type": "application/json", "Accept": "application/json"};
+            const response = await fetch("/services/offers?" + queryString, {
                 method: "GET", headers: headers, credentials: "include"
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
             const offers = await response.json();
-            offers.sort((a, b) => b.created - a.created);
+            // offers.sort((a, b) => b.created - a.created);
+            // TODO: filter
             return offers;
         } catch (error) {
             this.displayMessage(error);
         }
     }
 
-    async sendCreatedOrUpdatedOffer(offer) {
+    async displayQueriedOffers() {
         this.displayMessage("");
         try {
-            const section = this.#centerArticle.querySelector("section.own-offer");
+            const offerQueryParams = this.takeQueryFieldsFromInput();
+            const offers = await this.queryOffers(offerQueryParams);
 
-            const offerDTO = offer != null ? structuredClone(offer) : {identity: 0, version: 1};
-            if (offer == null) offerDTO.article = {};
+            const templateAvailableOffers = document.querySelector("head template.available-offers");
+            const sectionAvailableOffers = templateAvailableOffers.content.cloneNode(true).firstElementChild;
+            this.#centerArticle.append(sectionAvailableOffers);
 
-            offerDTO.article.category = section.querySelector("select.category").value.trim();
-            offerDTO.article.brand = section.querySelector("input.brand").value.trim();
-            offerDTO.article.alias = section.querySelector("input.name").value.trim();
-            offerDTO.article.description = section.querySelector("textarea.description").value.trim();
-            offerDTO.serial = section.querySelector("input.serial").value.trim() || null;
-            offerDTO.price = Math.floor(parseFloat(section.querySelector("input.price").value) * 100);
-            offerDTO.postage = Math.floor(parseFloat(section.querySelector("input.postage").value) * 100);
+            const offersTable = this.#centerArticle.querySelector("section.available-offers table.offers");
+            const tableBody = offersTable.querySelector("tbody");
+            const templateOffersTableRow = document.querySelector("head template.available-offer-table-row");
+            this.clearChildren(tableBody);
 
-            const headers = {"Content-Type": "application/json", "Accept" : "text/plain"};
-            const requestUrlPath = this.#reservedAvatarReference != null ?
-                "/services/offers?avatarReference=" + this.#reservedAvatarReference :
-                "/services/offers";
-            const response = await fetch(requestUrlPath, {
-                method: "POST", headers: headers, body: JSON.stringify(offerDTO), credentials: "include"
-            });
-            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
-            this.#reservedAvatarReference = null;
+            for (const offer of offers) {
+                const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
+                tableBody.append(sectionOffersTableRow)
 
-            const offers = await this.queryOffers();
-            this.updateOffersSection(offers);
+                const rowCells = sectionOffersTableRow.querySelectorAll("td");
+                const rowImages = sectionOffersTableRow.querySelectorAll("img");
+                rowImages[0].src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
+                // rowImages[0].addEventListener('click', event => this.displayOfferInInteractiveSection(offer));
+
+                rowCells[1].append(offer.article.category);
+                rowCells[2].append(offer.article.brand);
+                rowCells[3].append(offer.article.alias);
+                rowCells[4].append(offer.serial || "-");
+                rowCells[5].append((offer.price * 0.01).toFixed(2));
+                rowCells[6].append((offer.postage * 0.01).toFixed(2));
+            }
+
         } catch (error) {
             this.displayMessage(error)
         }
+    }
+
+    takeQueryFieldsFromInput() {
+        const section = this.#centerArticle.querySelector("section.offer-query");
+        const offerQueryParams = {};
+
+        offerQueryParams.category = section.querySelector("select.category").value.trim() || null;
+        offerQueryParams.brand = section.querySelector("input.brand").value.trim() || null;
+        offerQueryParams.alias = section.querySelector("input.name").value.trim() || null;
+        offerQueryParams.description = section.querySelector("input.description").value.trim() || null;
+
+        const minPriceInputValue = section.querySelector("input.min-price").value;
+        if (minPriceInputValue) offerQueryParams.lowerPrice = Math.floor(parseFloat(minPriceInputValue) * 100);
+        const maxPriceInputValue = section.querySelector("input.max-price").value;
+        if (maxPriceInputValue) offerQueryParams.upperPrice = Math.floor(parseFloat(maxPriceInputValue) * 100);
+        const minPostageInput = section.querySelector("input.min-postage").value;
+        if (minPostageInput) offerQueryParams.lowerPostage = Math.floor(parseFloat(minPostageInput) * 100);
+        const maxPostageInput = section.querySelector("input.max-postage").value;
+        if (maxPostageInput) offerQueryParams.upperPostage = Math.floor(parseFloat(maxPostageInput) * 100);
+
+        return offerQueryParams;
     }
 
     async sendAvatar(avatarFile, offer) {
