@@ -8,11 +8,7 @@ import xhr from "./xhr.js"
  */
 class ShoppingController extends Controller {
     #centerArticle;
-    #interactiveSection;
-
-    // used to store the avatarReference when an image is being uploaded
-    // before an offer is created and therefore can be linked to that avatar
-    #reservedAvatarReference;
+    #searchResultSection;
 
     /*
      * Initializes a new instance.
@@ -20,7 +16,6 @@ class ShoppingController extends Controller {
     constructor () {
         super();
         this.#centerArticle = document.querySelector("main article.center");
-        this.#interactiveSection, this.#reservedAvatarReference = null;
     }
 
     /*
@@ -28,83 +23,27 @@ class ShoppingController extends Controller {
      */
     async activate () {
         this.clearChildren(this.#centerArticle);
-        this.#interactiveSection = null;
 
         const templateOfferQuery = document.querySelector("head template.offer-query");
         const sectionOfferQuery = templateOfferQuery.content.cloneNode(true).firstElementChild;
         this.#centerArticle.append(sectionOfferQuery);
 
-        const searchButton = sectionOfferQuery.querySelector("button.search");
-        searchButton.addEventListener('click', () => this.displayQueriedOffers());
+        const searchOffersButton = sectionOfferQuery.querySelector("div.offer-criteria button.search");
+        searchOffersButton.addEventListener('click', () => this.searchOffers());
 
+        const searchSellerButton = sectionOfferQuery.querySelector("div.seller-criteria button.search");
+        searchSellerButton.addEventListener('click', () => this.searchSellers());
+
+        this.#searchResultSection = document.createElement('section');
+        this.#centerArticle.append(this.#searchResultSection);
         // const offers = await this.queryOffers();
         // this.updateOffersSection(offers);
     }
 
-    updateOffersSection(offers) {
-        const offersTable = this.#centerArticle.querySelector("section.own-offers table.offers");
-        const tableBody = offersTable.querySelector("tbody");
-        const templateOffersTableRow = document.querySelector("head template.own-offer-table-row");
-        this.clearChildren(tableBody);
-
-        for (const offer of offers) {
-            const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
-            tableBody.append(sectionOffersTableRow)
-
-            const rowCells = sectionOffersTableRow.querySelectorAll("td");
-            const rowImages = sectionOffersTableRow.querySelectorAll("img");
-            rowImages[0].src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
-            rowImages[0].addEventListener('click', event => this.displayOfferInInteractiveSection(offer));
-
-            if (offer.buyerReference) {
-                rowImages[1].src = "/services/people/" + offer.buyerReference + "/avatar" + "?cache-bust=" + Date.now();
-                rowImages[1].addEventListener('click', event => this.displayBuyerAndOrderInInteractiveSection(offer.buyerReference, offer.identity));
-            }
-
-            rowCells[2].append(offer.article.category);
-            rowCells[3].append(offer.article.brand);
-            rowCells[4].append(offer.article.alias);
-            rowCells[5].append(offer.serial || "-");
-            rowCells[6].append((offer.price * 0.01).toFixed(2));
-            rowCells[7].append((offer.postage * 0.01).toFixed(2));
-        }
-    }
-
-    displayOfferInInteractiveSection(offer) {
-        if (this.#interactiveSection) this.removeInteractiveSection();
-
-        const templateOwnOffer = document.querySelector("head template.own-offer");
-        const sectionOwnOffer = templateOwnOffer.content.cloneNode(true).firstElementChild;
-        this.#centerArticle.append(sectionOwnOffer);
-        this.#interactiveSection = sectionOwnOffer;
-
-        const cancelButton = sectionOwnOffer.querySelector("button.cancel");
-        cancelButton.addEventListener('click', event => this.removeInteractiveSection());
-        const createOrUpdateButton = sectionOwnOffer.querySelector("button.create-or-update");
-        createOrUpdateButton.addEventListener('click', event => this.sendCreatedOrUpdatedOffer(offer));
-
-        const avatarImage = sectionOwnOffer.querySelector("img.avatar");
-        avatarImage.addEventListener("drop", event => this.sendAvatar(event.dataTransfer.files[0], offer));
-
-        if (offer == null) {
-            createOrUpdateButton.append("create");
-            avatarImage.src = "/services/documents/1";
-            return;
-        }
-        createOrUpdateButton.append("update");
-        avatarImage.src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
-        sectionOwnOffer.querySelector("select.category.article").value = offer.article.category;
-        sectionOwnOffer.querySelector("input.brand.article").value = offer.article.brand;
-        sectionOwnOffer.querySelector("input.name.article").value = offer.article.alias;
-        sectionOwnOffer.querySelector("textarea.description.article").value = offer.article.description;
-        sectionOwnOffer.querySelector("input.serial.article").value = offer.serial || "";
-        sectionOwnOffer.querySelector("input.price.article.numeric").value = (offer.price * 0.01).toFixed(2);
-        sectionOwnOffer.querySelector("input.postage.article.numeric").value = (offer.postage * 0.01).toFixed(2);
-    }
-
-    removeInteractiveSection() {
-        this.#centerArticle.removeChild(this.#interactiveSection);
-        this.#interactiveSection, this.#reservedAvatarReference = null;
+    async searchOffers() {
+        const offerQueryParams = this.takeOfferQueryParamsFromInput();
+        const offers = await this.queryOffers(offerQueryParams);
+        this.displayQueriedOffers(offers);
     }
 
     async queryOffers(queryParams) {
@@ -131,17 +70,15 @@ class ShoppingController extends Controller {
         }
     }
 
-    async displayQueriedOffers() {
+    async displayQueriedOffers(offers) {
         this.displayMessage("");
         try {
-            const offerQueryParams = this.takeQueryFieldsFromInput();
-            const offers = await this.queryOffers(offerQueryParams);
-
+            this.clearChildren(this.#searchResultSection);
             const templateAvailableOffers = document.querySelector("head template.available-offers");
             const sectionAvailableOffers = templateAvailableOffers.content.cloneNode(true).firstElementChild;
-            this.#centerArticle.append(sectionAvailableOffers);
+            this.#searchResultSection.append(sectionAvailableOffers);
 
-            const offersTable = this.#centerArticle.querySelector("section.available-offers table.offers");
+            const offersTable = this.#searchResultSection.querySelector("section.available-offers table.offers");
             const tableBody = offersTable.querySelector("tbody");
             const templateOffersTableRow = document.querySelector("head template.available-offer-table-row");
             this.clearChildren(tableBody);
@@ -151,9 +88,10 @@ class ShoppingController extends Controller {
                 tableBody.append(sectionOffersTableRow)
 
                 const rowCells = sectionOffersTableRow.querySelectorAll("td");
-                const rowImages = sectionOffersTableRow.querySelectorAll("img");
-                rowImages[0].src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
-                // rowImages[0].addEventListener('click', event => this.displayOfferInInteractiveSection(offer));
+                const avatarImage = sectionOffersTableRow.querySelector("img.avatar");
+                const avatarButton = sectionOffersTableRow.querySelector("button.select")
+                avatarImage.src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
+                avatarButton.addEventListener('click', event => this.addToCart(offer));
 
                 rowCells[1].append(offer.article.category);
                 rowCells[2].append(offer.article.brand);
@@ -168,7 +106,7 @@ class ShoppingController extends Controller {
         }
     }
 
-    takeQueryFieldsFromInput() {
+    takeOfferQueryParamsFromInput() {
         const section = this.#centerArticle.querySelector("section.offer-query");
         const offerQueryParams = {};
 
@@ -189,35 +127,84 @@ class ShoppingController extends Controller {
         return offerQueryParams;
     }
 
-    async sendAvatar(avatarFile, offer) {
-        this.displayMessage("");
-        try {
-            const avatarImage = document.querySelector("section.own-offer img.avatar");
-            let response, headers;
+    addToCart(offer) {
+        Controller.shoppingCart.push(offer);
+    }
 
-            headers = {"Content-Type": avatarFile.type, "Accept": "text/plain"};
-            response = await fetch("/services/documents", {
-                method: "POST", credentials: "include", headers: headers, body: avatarFile
+    async querySellers(queryParams) {
+        this.displayMessage("")
+        try {
+            // TODO: method for this
+            const queryString = Object
+                .keys(queryParams)
+                .filter(key => queryParams[key] != null) // TODO: maybe don't even assign null values as you may want them to be sent in some cases
+                .map(key => key + '=' + queryParams[key])
+                .join('&');
+
+            const headers = {"Content-Type": "application/json", "Accept": "application/json"};
+            const response = await fetch("/services/people?" + queryString, {
+                method: "GET", headers: headers, credentials: "include"
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
-            const avatarReference = parseInt(await response.text());
 
-            if (offer == null) {
-                this.#reservedAvatarReference = avatarReference;
-            } else {
-                headers = {"Content-Type": "application/json", "Accept": "text/plain"};
-                response = await fetch("/services/offers?avatarReference=" + avatarReference, {
-                    method: "POST", credentials: "include", headers: headers, body: JSON.stringify(offer)
-                });
-                if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
-
-                avatarImage.src = "/services/documents/" + avatarReference + "?cache-bust=" + Date.now();
-            }
+            const persons = await response.json();
+            // offers.sort((a, b) => b.created - a.created);
+            // TODO: filter
+            return persons;
         } catch (error) {
             this.displayMessage(error);
         }
     }
 
+    async searchSellers() {
+        const sellerQueryParams = this.takeSellerQueryParamsFromInput();
+        const sellers = await this.querySellers(sellerQueryParams);
+
+        this.clearChildren(this.#searchResultSection);
+        const templateSellerSelection = document.querySelector("head template.seller-selection");
+        const sectionSellerSelection = templateSellerSelection.content.cloneNode(true).firstElementChild;
+        this.#searchResultSection.append(sectionSellerSelection);
+
+        const sellersTable = sectionSellerSelection.querySelector("table.seller-selection");
+        const tableBody = sellersTable.querySelector("tbody");
+        const templateSellersTableRow = document.querySelector("head template.seller-table-row");
+        this.clearChildren(tableBody);
+
+        for (const seller of sellers) {
+            const sectionOffersTableRow = templateSellersTableRow.content.cloneNode(true).firstElementChild;
+            tableBody.append(sectionOffersTableRow)
+
+            const rowCells = sectionOffersTableRow.querySelectorAll("td");
+            const avatarImage = sectionOffersTableRow.querySelector("img.avatar");
+            const avatarButton = sectionOffersTableRow.querySelector("button.search")
+            avatarImage.src = "/services/people/" + seller.identity + "/avatar" + "?cache-bust=" + Date.now();
+            avatarButton.addEventListener('click', event => console.log("search offers for person"));
+
+            rowCells[1].append(seller.email);
+            rowCells[2].append(seller.name.given);
+            rowCells[3].append(seller.name.family);
+            rowCells[4].append(seller.address.postcode);
+            rowCells[5].append(seller.address.street);
+            rowCells[6].append(seller.address.city);
+            rowCells[7].append(seller.address.country);
+            rowCells[8].append(seller.account.iban);
+            rowCells[9].append(seller.account.bic);
+        }
+    }
+
+    takeSellerQueryParamsFromInput() {
+        const section = this.#centerArticle.querySelector("section.offer-query");
+        const sellerQueryParams = {};
+
+        sellerQueryParams.title = section.querySelector("input.title").value.trim() || null;
+        sellerQueryParams.givenName = section.querySelector("input.forename").value.trim() || null;
+        sellerQueryParams.familyName = section.querySelector("input.surname").value.trim() || null;
+        sellerQueryParams.city = section.querySelector("input.city").value.trim() || null;
+        sellerQueryParams.country = section.querySelector("input.country").value.trim() || null;
+        sellerQueryParams.bic = section.querySelector("input.bic").value.trim() || null;
+
+        return sellerQueryParams;
+    }
     async queryBuyer(buyerId) {
         this.displayMessage("")
         try {
@@ -249,13 +236,13 @@ class ShoppingController extends Controller {
     }
 
     async displayBuyerAndOrderInInteractiveSection(buyerId, offerId) {
-        if (this.#interactiveSection) this.removeInteractiveSection();
+        if (this.#searchResultSection) this.removeSearchResultSection();
 
         const buyer = await this.queryBuyer(buyerId);
         const templateBuyerInfo = document.querySelector("head template.buyer-display");
         const sectionBuyerInfo = templateBuyerInfo.content.cloneNode(true).firstElementChild;
         this.#centerArticle.append(sectionBuyerInfo);
-        this.#interactiveSection = sectionBuyerInfo;
+        this.#searchResultSection = sectionBuyerInfo;
 
         sectionBuyerInfo.querySelector("input.email.personal").value = buyer.email;
         sectionBuyerInfo.querySelector("input.title.personal").value = buyer.name.title;
