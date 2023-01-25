@@ -81,18 +81,28 @@ class ShoppingController extends Controller {
             const offersTable = this.#searchResultSection.querySelector("section.available-offers table.offers");
             const tableBody = offersTable.querySelector("tbody");
             const templateOffersTableRow = document.querySelector("head template.available-offer-table-row");
+
+            const templateAvailableOffer = document.querySelector("head template.available-offer");
+
+
             this.clearChildren(tableBody);
 
             for (const offer of offers) {
                 const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
-                tableBody.append(sectionOffersTableRow)
+
+                const sectionAvailableOffer = templateAvailableOffer.content.cloneNode(true).firstElementChild;
+                const sectionRow = sectionAvailableOffer.querySelector(".row");
+                const addToCartButton = sectionAvailableOffer.querySelector("button.add-to-cart");
+                addToCartButton.addEventListener('click', event => this.addToCart(offer));
+                const orderNowButton = sectionAvailableOffer.querySelector("button.order-now");
+                orderNowButton.addEventListener('click', event => this.addToOrders(offer));
+
+                tableBody.append(sectionAvailableOffer);
+                sectionRow.append(sectionOffersTableRow);
 
                 const rowCells = sectionOffersTableRow.querySelectorAll("td");
                 const avatarImage = sectionOffersTableRow.querySelector("img.avatar");
-                const avatarButton = sectionOffersTableRow.querySelector("button.select")
                 avatarImage.src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
-                avatarButton.addEventListener('click', event => this.addToCart(offer));
-
                 rowCells[1].append(offer.article.category);
                 rowCells[2].append(offer.article.brand);
                 rowCells[3].append(offer.article.alias);
@@ -154,6 +164,10 @@ class ShoppingController extends Controller {
         } catch (error) {
             this.displayMessage(error);
         }
+    }
+
+    addToOrders(offer) {
+        //TODO: implement
     }
 
     async searchSellers() {

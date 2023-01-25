@@ -675,7 +675,7 @@
 
 		<template class="available-offer">
 			<section class="available-offer">
-				<fieldset>
+				<fieldset class="available-offer">
 					<legend>Offer</legend>
 					<div class="row"></div>
 				</fieldset>
@@ -685,21 +685,72 @@
 		</template>
 
 		<template class="shopping-cart">
-			<section class="shopping-cart"></section>
+			<fieldset class="shopping-cart">
+				<legend>Cart Elements by Seller</legend>
+				<section class="shopping-cart"></section>
+			</fieldset>
 		</template>
 
-		<template class="seller-offers">
-			<div class="seller-offers">
+		<template class="cart-offer-display-table">
+			<section class="cart-offer-display-table">
 				<fieldset>
-					<legend>Associated Offers</legend>
-					<div class="row"></div>
+					<legend>Your Orders</legend>
+					<table class="offers">
+						<thead>
+							<tr>
+								<th>Image</th>
+								<th>Category</th>
+								<th>Item</th>
+								<th>Serial</th>
+								<th class="numeric">Price</th>
+								<th class="numeric">Postage</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
 				</fieldset>
-				<button class="order-now" type="button">order now</button>
-			</div>
+			</section>
+		</template>
+
+		<template class="cart-offer-display-table-row">
+			<tr class="cart-offer-display-table-row">
+				<td><img class="avatar" /></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td class="numeric"></td>
+				<td class="numeric"></td>
+				<td><button class="remove" type="button">Remove</button></td>
+			</tr>
+		</template>
+
+		<template class="seller-order-display">
+			<section class="seller-order-display">
+				<fieldset>
+					<legend>Sellers</legend>
+					<div class="seller-display">
+						<div>
+							<label class="horizontal">Price Sum</label>
+							<input class="priceSum" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal">Postage</label>
+							<input class="postage" type="email" disabled></input>
+						</div>
+						<div>
+							<label class="horizontal">Total</label>
+							<input class="total" type="text" disabled>
+						</div>
+						<div>
+							<label class="horizontal"></label>
+							<button class="order-now" type="button">order now</button>
+						</div>
+					</div>
+				</fieldset>
+			</section>
 		</template>
 	</head>
-
-
 	<body>
 		<header>
 			<nav class="horizontal">

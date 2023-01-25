@@ -110,9 +110,9 @@ class OrderController extends Controller {
         const offersTable = this.#centerArticle.querySelector("section.offer-display-table table.offers");
         const tableBody = offersTable.querySelector("tbody");
         const templateOffersTableRow = document.querySelector("head template.offer-display-table-row");
-        const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
 
         for (const offer of offers) {
+            const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
             tableBody.append(sectionOffersTableRow);
 
             const rowCells = sectionOffersTableRow.querySelectorAll("td");
