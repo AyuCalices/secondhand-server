@@ -215,6 +215,8 @@ class ShoppingController extends Controller {
         const templateSellerOffers = document.querySelector("head template.seller-offers");
         const sectionSellerOffers = templateSellerOffers.content.cloneNode(true).firstElementChild;
         this.#searchResultSection.append(sectionSellerOffers);
+        const orderNowButton = sectionSellerOffers.querySelector("div.seller-offers button.order-now");
+        orderNowButton.addEventListener('click', console.log("order now"));
 
         const sellerOffersContentDiv = document.querySelector("div.row")
 
@@ -243,7 +245,7 @@ class ShoppingController extends Controller {
             this.displayMessage(error);
         }
     }
-    
+
     composeQueryParamString(queryParams) {
         return Object
             .keys(queryParams)
