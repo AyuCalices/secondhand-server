@@ -3,10 +3,10 @@ import xhr from "./xhr.js"
 
 
 /*
- * Shopping controller type.
+ * Cart controller type.
  * Copyright (c) 2022 Sascha Baumeister
  */
-class CartController extends Controller {
+export default class CartController extends Controller {
     #centerArticle;
     #interactiveSellerSection
 

@@ -1,6 +1,5 @@
-import Controller from "./controller.js"
-import xhr from "./xhr.js"
-
+import Controller from "./controller.js";
+import CartController from "./cart-controller.js";
 
 /*
  * Shopping controller type.
@@ -210,7 +209,7 @@ class ShoppingController extends Controller {
         const sectionSellerOffers = templateSellerOffers.content.cloneNode(true).firstElementChild;
         this.#searchResultSection.append(sectionSellerOffers);
         const orderNowButton = sectionSellerOffers.querySelector("div.seller-offers button.order-now");
-        orderNowButton.addEventListener('click', console.log("order now"));
+        orderNowButton.addEventListener('click', event => this.navigateToCartController());
 
         const sellerOffersContentDiv = document.querySelector("div.row")
 
@@ -236,6 +235,11 @@ class ShoppingController extends Controller {
         } catch (error) {
             this.displayMessage(error);
         }
+    }
+
+    navigateToCartController() {
+        const controller = new CartController();
+        controller.active = true
     }
 
     composeQueryParamString(queryParams) {
