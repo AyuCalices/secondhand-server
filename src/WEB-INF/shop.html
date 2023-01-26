@@ -653,6 +653,7 @@
 								<th class="numeric">Serial</th>
 								<th class="numeric">Price (€)</th>
 								<th class="numeric">Postage (€)</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody></tbody>
@@ -670,6 +671,10 @@
 				<td class="numeric"></td>
 				<td class="numeric"></td>
 				<td class="numeric"></td>
+				<td>
+					<button class="order-now" type="button">order it now</button>
+					<button class="add-to-cart" type="button">add to cart</button>
+				</td>
 			</tr>
 		</template>
 
@@ -682,6 +687,16 @@
 				<button class="order-now" type="button">order it now</button>
 				<button class="add-to-cart" type="button">add to cart</button>
 			</section>
+		</template>
+
+		<template class="seller-offers">
+			<div class="seller-offers">
+				<fieldset>
+					<legend>Associated Offers</legend>
+					<div class="row"></div>
+				</fieldset>
+				<button class="order-now" type="button">order now</button>
+			</div>
 		</template>
 
 		<template class="shopping-cart">

@@ -43,7 +43,11 @@ class ShoppingController extends Controller {
     async searchOffers() {
         const offerQueryParams = this.takeOfferQueryParamsFromInput();
         const offers = await this.queryOffers(offerQueryParams);
-        this.displayQueriedOffers(offers);
+        this.clearChildren(this.#searchResultSection);
+        const templateAvailableOffers = document.querySelector("head template.available-offers");
+        const sectionAvailableOffers = templateAvailableOffers.content.cloneNode(true).firstElementChild;
+        this.#searchResultSection.append(sectionAvailableOffers);
+        this.displayQueriedOffers(offers, sectionAvailableOffers);
     }
 
     async queryOffers(queryParams) {
@@ -70,39 +74,30 @@ class ShoppingController extends Controller {
         }
     }
 
-    async displayQueriedOffers(offers) {
-        this.displayMessage("");
-        try {
-            this.clearChildren(this.#searchResultSection);
-            const templateAvailableOffers = document.querySelector("head template.available-offers");
-            const sectionAvailableOffers = templateAvailableOffers.content.cloneNode(true).firstElementChild;
-            this.#searchResultSection.append(sectionAvailableOffers);
+    async displayQueriedOffers(offers, parentNode) {
+        const offersTable = parentNode.querySelector("table.offers");
+        const tableBody = offersTable.querySelector("tbody");
+        const templateOffersTableRow = document.querySelector("head template.available-offer-table-row");
+        this.clearChildren(tableBody);
 
-            const offersTable = this.#searchResultSection.querySelector("section.available-offers table.offers");
-            const tableBody = offersTable.querySelector("tbody");
-            const templateOffersTableRow = document.querySelector("head template.available-offer-table-row");
-            this.clearChildren(tableBody);
+        for (const offer of offers) {
+            const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
+            tableBody.append(sectionOffersTableRow)
 
-            for (const offer of offers) {
-                const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
-                tableBody.append(sectionOffersTableRow)
+            const rowCells = sectionOffersTableRow.querySelectorAll("td");
+            const avatarImage = sectionOffersTableRow.querySelector("img.avatar");
+            const avatarButton = sectionOffersTableRow.querySelector("button.select")
+            avatarImage.src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
+            avatarButton.addEventListener('click', event => this.addToCart(offer));
 
-                const rowCells = sectionOffersTableRow.querySelectorAll("td");
-                const avatarImage = sectionOffersTableRow.querySelector("img.avatar");
-                const avatarButton = sectionOffersTableRow.querySelector("button.select")
-                avatarImage.src = "/services/offers/" + offer.identity + "/avatar" + "?cache-bust=" + Date.now();
-                avatarButton.addEventListener('click', event => this.addToCart(offer));
-
-                rowCells[1].append(offer.article.category);
-                rowCells[2].append(offer.article.brand);
-                rowCells[3].append(offer.article.alias);
-                rowCells[4].append(offer.serial || "-");
-                rowCells[5].append((offer.price * 0.01).toFixed(2));
-                rowCells[6].append((offer.postage * 0.01).toFixed(2));
-            }
-
-        } catch (error) {
-            this.displayMessage(error)
+            rowCells[1].append(offer.article.category);
+            rowCells[2].append(offer.article.brand);
+            rowCells[3].append(offer.article.alias);
+            rowCells[4].append(offer.serial || "-");
+            rowCells[5].append((offer.price * 0.01).toFixed(2));
+            rowCells[6].append((offer.postage * 0.01).toFixed(2));
+            rowCells[7].querySelector("button.order-now").addEventListener('click', event => console.log("order now"));
+            rowCells[7].querySelector("button.add-to-cart").addEventListener('click', event => this.addToCart(offer));
         }
     }
 
@@ -129,6 +124,10 @@ class ShoppingController extends Controller {
 
     addToCart(offer) {
         Controller.shoppingCart.push(offer);
+    }
+
+    orderNow(offer) {
+        // TODO
     }
 
     async querySellers(queryParams) {
@@ -159,7 +158,10 @@ class ShoppingController extends Controller {
     async searchSellers() {
         const sellerQueryParams = this.takeSellerQueryParamsFromInput();
         const sellers = await this.querySellers(sellerQueryParams);
+        this.displaySellers(sellers);
+    }
 
+    displaySellers(sellers) {
         this.clearChildren(this.#searchResultSection);
         const templateSellerSelection = document.querySelector("head template.seller-selection");
         const sectionSellerSelection = templateSellerSelection.content.cloneNode(true).firstElementChild;
@@ -178,7 +180,10 @@ class ShoppingController extends Controller {
             const avatarImage = sectionOffersTableRow.querySelector("img.avatar");
             const avatarButton = sectionOffersTableRow.querySelector("button.search")
             avatarImage.src = "/services/people/" + seller.identity + "/avatar" + "?cache-bust=" + Date.now();
-            avatarButton.addEventListener('click', event => console.log("search offers for person"));
+            avatarButton.addEventListener('click', event => {
+                this.displaySellers([seller]);
+                this.searchOffersFromSeller(seller.identity)
+            });
 
             rowCells[1].append(seller.email);
             rowCells[2].append(seller.name.given);
@@ -204,6 +209,41 @@ class ShoppingController extends Controller {
         sellerQueryParams.bic = section.querySelector("input.bic").value.trim() || null;
 
         return sellerQueryParams;
+    }
+
+    async searchOffersFromSeller(sellerId) {
+        const offers = await this.queryOffersFromSeller(sellerId);
+
+        const templateSellerOffers = document.querySelector("head template.seller-offers");
+        const sectionSellerOffers = templateSellerOffers.content.cloneNode(true).firstElementChild;
+        this.#searchResultSection.append(sectionSellerOffers);
+
+        const sellerOffersContentDiv = document.querySelector("div.row")
+
+        const templateAvailableOffers = document.querySelector("head template.available-offers");
+        const sectionAvailableOffers = templateAvailableOffers.content.cloneNode(true)
+        const offersTable = sectionAvailableOffers.firstElementChild.querySelector("table.offers");
+        sellerOffersContentDiv.append(offersTable);
+
+        this.displayQueriedOffers(offers, sectionSellerOffers);
+    }
+
+    async queryOffersFromSeller(sellerId) {
+        this.displayMessage("")
+        try {
+            const headers = {"Content-Type": "application/json", "Accept": "application/json"};
+            const response = await fetch("/services/people/" + sellerId + "/offers", {
+                method: "GET", headers: headers, credentials: "include"
+            });
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+
+            const offers = await response.json();
+            // offers.sort((a, b) => b.created - a.created);
+            // TODO: filter
+            return offers;
+        } catch (error) {
+            this.displayMessage(error);
+        }
     }
     
 }

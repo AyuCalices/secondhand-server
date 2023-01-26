@@ -182,7 +182,7 @@ section.seller-selection img.avatar {
 	width: 2em;
 }
 
-section.available-offers img.avatar {
+section.available-offers img.avatar, table.offers img.avatar {
 	vertical-align: middle;
 	height: 2em;
 	width: 2em;
