@@ -36,8 +36,6 @@ class ShoppingController extends Controller {
 
         this.#searchResultSection = document.createElement('section');
         this.#centerArticle.append(this.#searchResultSection);
-        // const offers = await this.queryOffers();
-        // this.updateOffersSection(offers);
     }
 
     async searchOffers() {
@@ -60,9 +58,7 @@ class ShoppingController extends Controller {
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
             const offers = await response.json();
-            // offers.sort((a, b) => b.created - a.created);
-            // TODO: filter
-            return offers;
+            return offers.filter(offer => offer.orderReference == null);
         } catch (error) {
             this.displayMessage(error);
         }
@@ -145,8 +141,6 @@ class ShoppingController extends Controller {
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
             const persons = await response.json();
-            // offers.sort((a, b) => b.created - a.created);
-            // TODO: filter
             return persons;
         } catch (error) {
             this.displayMessage(error);
@@ -238,9 +232,7 @@ class ShoppingController extends Controller {
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
             const offers = await response.json();
-            // offers.sort((a, b) => b.created - a.created);
-            // TODO: filter
-            return offers;
+            return offers.filter(offer => offer.orderReference == null);
         } catch (error) {
             this.displayMessage(error);
         }
