@@ -53,14 +53,8 @@ class ShoppingController extends Controller {
     async queryOffers(queryParams) {
         this.displayMessage("")
         try {
-            const queryString = Object
-                .keys(queryParams)
-                .filter(key => queryParams[key] != null) // TODO: maybe don't even assign null values as you may want them to be sent in some cases
-                .map(key => key + '=' + queryParams[key])
-                .join('&');
-
             const headers = {"Content-Type": "application/json", "Accept": "application/json"};
-            const response = await fetch("/services/offers?" + queryString, {
+            const response = await fetch("/services/offers?" + this.composeQueryParamString(queryParams), {
                 method: "GET", headers: headers, credentials: "include"
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
@@ -96,7 +90,7 @@ class ShoppingController extends Controller {
             rowCells[4].append(offer.serial || "-");
             rowCells[5].append((offer.price * 0.01).toFixed(2));
             rowCells[6].append((offer.postage * 0.01).toFixed(2));
-            rowCells[7].querySelector("button.order-now").addEventListener('click', event => console.log("order now"));
+            rowCells[7].querySelector("button.order-now").addEventListener('click', event => this.orderNow(offer.identity));
             rowCells[7].querySelector("button.add-to-cart").addEventListener('click', event => this.addToCart(offer));
         }
     }
@@ -126,22 +120,26 @@ class ShoppingController extends Controller {
         Controller.shoppingCart.push(offer);
     }
 
-    orderNow(offer) {
-        // TODO
+    async orderNow(offerId) {
+        this.displayMessage("");
+        try {
+            const headers = {"Content-Type": "application/json", "Accept": "text/plain"};
+
+            const response = await fetch("/services/orders?offerReference=" + offerId, {
+                method: "POST", headers: headers, body: JSON.stringify({}), credentials: "include"
+            });
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+
+        } catch (error) {
+            this.displayMessage(error)
+        }
     }
 
     async querySellers(queryParams) {
         this.displayMessage("")
         try {
-            // TODO: method for this
-            const queryString = Object
-                .keys(queryParams)
-                .filter(key => queryParams[key] != null) // TODO: maybe don't even assign null values as you may want them to be sent in some cases
-                .map(key => key + '=' + queryParams[key])
-                .join('&');
-
             const headers = {"Content-Type": "application/json", "Accept": "application/json"};
-            const response = await fetch("/services/people?" + queryString, {
+            const response = await fetch("/services/people?" + this.composeQueryParamString(queryParams), {
                 method: "GET", headers: headers, credentials: "include"
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
@@ -246,7 +244,16 @@ class ShoppingController extends Controller {
         }
     }
     
+    composeQueryParamString(queryParams) {
+        return Object
+            .keys(queryParams)
+            .filter(key => queryParams[key] != null)
+            .map(key => key + '=' + queryParams[key])
+            .join('&');
+    }
+
 }
+
 
 /*
  * Performs controller event listener registration during load event handling.
