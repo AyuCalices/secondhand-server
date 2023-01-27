@@ -1,5 +1,4 @@
 import Controller from "./controller.js";
-import CartController from "./cart-controller.js";
 
 /*
  * Shopping controller type.
@@ -88,7 +87,6 @@ class ShoppingController extends Controller {
             rowCells[4].append(offer.serial || "-");
             rowCells[5].append((offer.price * 0.01).toFixed(2));
             rowCells[6].append((offer.postage * 0.01).toFixed(2));
-            rowCells[7].querySelector("button.order-now").addEventListener('click', event => this.orderNow(offer.identity));
             rowCells[7].querySelector("button.add-to-cart").addEventListener('click', event => this.addToCart(offer));
         }
     }
@@ -116,21 +114,6 @@ class ShoppingController extends Controller {
 
     addToCart(offer) {
         Controller.shoppingCart.push(offer);
-    }
-
-    async orderNow(offerId) {
-        this.displayMessage("");
-        try {
-            const headers = {"Content-Type": "application/json", "Accept": "text/plain"};
-
-            const response = await fetch("/services/orders?offerReference=" + offerId, {
-                method: "POST", headers: headers, body: JSON.stringify({}), credentials: "include"
-            });
-            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
-
-        } catch (error) {
-            this.displayMessage(error)
-        }
     }
 
     async querySellers(params) {
@@ -214,8 +197,6 @@ class ShoppingController extends Controller {
         const templateSellerOffers = document.querySelector("head template.seller-offers");
         const sectionSellerOffers = templateSellerOffers.content.cloneNode(true).firstElementChild;
         this.#searchResultSection.append(sectionSellerOffers);
-        const orderNowButton = sectionSellerOffers.querySelector("div.seller-offers button.order-now");
-        orderNowButton.addEventListener('click', event => this.navigateToCartController());
 
         const sellerOffersContentDiv = document.querySelector("div.row")
 
@@ -241,11 +222,6 @@ class ShoppingController extends Controller {
         } catch (error) {
             this.displayMessage(error);
         }
-    }
-
-    navigateToCartController() {
-        const controller = new CartController();
-        controller.active = true
     }
 
 }
