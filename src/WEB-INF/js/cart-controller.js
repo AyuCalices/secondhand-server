@@ -129,10 +129,11 @@ export default class CartController extends Controller {
 
             rowImages[0].src = "/services/offers/" + shoppingCartOffer.identity + "/avatar" + "?cache-bust=" + Date.now();
             rowCells[1].append(shoppingCartOffer.article.category);
-            rowCells[2].append(shoppingCartOffer.article.alias);
-            rowCells[3].append(shoppingCartOffer.serial);
-            rowCells[4].append((shoppingCartOffer.price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
-            rowCells[5].append((shoppingCartOffer.postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
+            rowCells[2].append(shoppingCartOffer.article.brand);
+            rowCells[3].append(shoppingCartOffer.article.alias);
+            rowCells[4].append(shoppingCartOffer.serial);
+            rowCells[5].append((shoppingCartOffer.price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
+            rowCells[6].append((shoppingCartOffer.postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €");
         }
     }
 
@@ -153,8 +154,31 @@ export default class CartController extends Controller {
         sectionSellerInfo.querySelector("input.priceSum").value = (price * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €";
         sectionSellerInfo.querySelector("input.postage").value = (postage * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €";
         sectionSellerInfo.querySelector("input.total").value = ((price + postage) * 0.01).toFixed(2).toString().replaceAll(".", ",") + " €";
-        sectionSellerInfo.querySelector("button.order-now").addEventListener('click', event => console.log("Implement Ordering"));
-        //TODO: implement ordering
+        sectionSellerInfo.querySelector("button.order-now").addEventListener('click', async event => await this.orderAll(offers));
+    }
+
+    async orderAll(offers) {
+        for (const offer of offers) {
+            this.displayMessage("");
+            try {
+                const headers = {"Content-Type": "application/json", "Accept": "text/plain"};
+
+                const response = await fetch("/services/orders?offerReference=" + offerId, {
+                    method: "POST", headers: headers, body: JSON.stringify({}), credentials: "include"
+                });
+
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status + " " + response.statusText);
+                } else {
+                    this.removeOfferFromCart(offer);
+                }
+            } catch (error) {
+                this.displayMessage(error)
+            }
+        }
+
+        this.clearPage();
+        await this.updateShoppingCart();
     }
 }
 
