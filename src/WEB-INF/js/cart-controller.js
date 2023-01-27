@@ -84,7 +84,7 @@ export default class CartController extends Controller {
         const templateSellerInfo = document.querySelector("template.seller-display");
         const sectionSellerInfo = templateSellerInfo.content.cloneNode(true).firstElementChild;
         sectionShoppingCartEntries.append(sectionSellerInfo);
-
+        sectionSellerInfo.querySelector("div.avatar").removeChild(sectionSellerInfo.querySelector("label"));
         sectionSellerInfo.querySelector("img.avatar").src = "/services/people/" + seller.identity + "/avatar" + "?cache-bust=" + Date.now();
 
         sectionSellerInfo.querySelector("input.name").value = seller.name.given + " " + seller.name.family;
