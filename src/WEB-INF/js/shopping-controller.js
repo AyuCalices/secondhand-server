@@ -46,13 +46,10 @@ class ShoppingController extends Controller {
         this.displayQueriedOffers(offers, sectionAvailableOffers);
     }
 
-    async queryOffers(params) {
+    async queryOffers(queryParams) {
         this.displayMessage("")
         try {
             const headers = {"Content-Type": "application/json", "Accept": "application/json"};
-            const queryParams = new URLSearchParams();
-            for (const key of Object.keys(params).filter(key => params[key] != null))
-                queryParams.append(key, params[key]);
             const response = await fetch("/services/offers?" + queryParams.toString(), {
                 method: "GET", headers: headers, credentials: "include"
             });
@@ -93,21 +90,25 @@ class ShoppingController extends Controller {
 
     takeOfferQueryParamsFromInput() {
         const section = this.#centerArticle.querySelector("section.offer-query");
-        const offerQueryParams = {};
+        const offerQueryParams = new URLSearchParams();
 
-        offerQueryParams.category = section.querySelector("select.category").value.trim() || null;
-        offerQueryParams.brand = section.querySelector("input.brand").value.trim() || null;
-        offerQueryParams.alias = section.querySelector("input.name").value.trim() || null;
-        offerQueryParams.description = section.querySelector("input.description").value.trim() || null;
+        const category = section.querySelector("select.category").value.trim();
+        if (category) offerQueryParams.set("category", category);
+        const brand = section.querySelector("input.brand").value.trim();
+        if (brand) offerQueryParams.set("brand", brand);
+        const alias = section.querySelector("input.name").value.trim();
+        if (alias) offerQueryParams.set("alias", alias);
+        const description = section.querySelector("input.description").value.trim();
+        if (description) offerQueryParams.set("description", description);
 
         const minPriceInputValue = section.querySelector("input.min-price").value;
-        if (minPriceInputValue) offerQueryParams.lowerPrice = Math.floor(parseFloat(minPriceInputValue) * 100);
+        if (minPriceInputValue) offerQueryParams.set("lowerPrice", Math.floor(parseFloat(minPriceInputValue) * 100));
         const maxPriceInputValue = section.querySelector("input.max-price").value;
-        if (maxPriceInputValue) offerQueryParams.upperPrice = Math.floor(parseFloat(maxPriceInputValue) * 100);
+        if (maxPriceInputValue) offerQueryParams.set("upperPrice", Math.floor(parseFloat(maxPriceInputValue) * 100));
         const minPostageInput = section.querySelector("input.min-postage").value;
-        if (minPostageInput) offerQueryParams.lowerPostage = Math.floor(parseFloat(minPostageInput) * 100);
+        if (minPostageInput) offerQueryParams.set("lowerPostage", Math.floor(parseFloat(minPostageInput) * 100));
         const maxPostageInput = section.querySelector("input.max-postage").value;
-        if (maxPostageInput) offerQueryParams.upperPostage = Math.floor(parseFloat(maxPostageInput) * 100);
+        if (maxPostageInput) offerQueryParams.set("upperPostage", Math.floor(parseFloat(maxPostageInput) * 100));
 
         return offerQueryParams;
     }
@@ -116,13 +117,10 @@ class ShoppingController extends Controller {
         Controller.shoppingCart.push(offer);
     }
 
-    async querySellers(params) {
+    async querySellers(queryParams) {
         this.displayMessage("")
         try {
             const headers = {"Content-Type": "application/json", "Accept": "application/json"};
-            const queryParams = new URLSearchParams();
-            for (const key of Object.keys(params).filter(key => params[key] != null))
-                queryParams.append(key, params[key]);
             const response = await fetch("/services/people?"+ queryParams.toString(), {
                 method: "GET", headers: headers, credentials: "include"
             });
@@ -179,14 +177,20 @@ class ShoppingController extends Controller {
 
     takeSellerQueryParamsFromInput() {
         const section = this.#centerArticle.querySelector("section.offer-query");
-        const sellerQueryParams = {};
+        const sellerQueryParams = new URLSearchParams();
 
-        sellerQueryParams.title = section.querySelector("input.title").value.trim() || null;
-        sellerQueryParams.givenName = section.querySelector("input.forename").value.trim() || null;
-        sellerQueryParams.familyName = section.querySelector("input.surname").value.trim() || null;
-        sellerQueryParams.city = section.querySelector("input.city").value.trim() || null;
-        sellerQueryParams.country = section.querySelector("input.country").value.trim() || null;
-        sellerQueryParams.bic = section.querySelector("input.bic").value.trim() || null;
+        const title = section.querySelector("input.title").value.trim();
+        if (title) sellerQueryParams.set("title", title);
+        const givenName = section.querySelector("input.forename").value.trim();
+        if (givenName) sellerQueryParams.set("givenName", givenName);
+        const familyName = section.querySelector("input.surname").value.trim();
+        if (familyName) sellerQueryParams.set("familyName", familyName);
+        const city = section.querySelector("input.city").value.trim();
+        if (city) sellerQueryParams.set("city", city);
+        const country = section.querySelector("input.country").value.trim();
+        if (country) sellerQueryParams.set("country", country);
+        const bic = section.querySelector("input.bic").value.trim();
+        if (bic) sellerQueryParams.set("bic", bic);
 
         return sellerQueryParams;
     }

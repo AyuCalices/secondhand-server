@@ -169,7 +169,7 @@ class CartController extends Controller {
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
             for (const offer of offers) {
                 const index = Controller.shoppingCart.findIndex(element => element.identity === offer.identity);
-                if (index !== -1) delete Controller.shoppingCart[index];
+                if (index !== -1) Controller.shoppingCart.splice(index, 1);
             }
         } catch (error) {
             this.displayMessage(error)
