@@ -47,11 +47,14 @@ class ShoppingController extends Controller {
         this.displayQueriedOffers(offers, sectionAvailableOffers);
     }
 
-    async queryOffers(queryParams) {
+    async queryOffers(params) {
         this.displayMessage("")
         try {
             const headers = {"Content-Type": "application/json", "Accept": "application/json"};
-            const response = await fetch("/services/offers?" + this.composeQueryParamString(queryParams), {
+            const queryParams = new URLSearchParams();
+            for (const key of Object.keys(params).filter(key => params[key] != null))
+                queryParams.append(key, params[key]);
+            const response = await fetch("/services/offers?" + queryParams.toString(), {
                 method: "GET", headers: headers, credentials: "include"
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
@@ -130,11 +133,14 @@ class ShoppingController extends Controller {
         }
     }
 
-    async querySellers(queryParams) {
+    async querySellers(params) {
         this.displayMessage("")
         try {
             const headers = {"Content-Type": "application/json", "Accept": "application/json"};
-            const response = await fetch("/services/people?" + this.composeQueryParamString(queryParams), {
+            const queryParams = new URLSearchParams();
+            for (const key of Object.keys(params).filter(key => params[key] != null))
+                queryParams.append(key, params[key]);
+            const response = await fetch("/services/people?"+ queryParams.toString(), {
                 method: "GET", headers: headers, credentials: "include"
             });
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
@@ -240,14 +246,6 @@ class ShoppingController extends Controller {
     navigateToCartController() {
         const controller = new CartController();
         controller.active = true
-    }
-
-    composeQueryParamString(queryParams) {
-        return Object
-            .keys(queryParams)
-            .filter(key => queryParams[key] != null)
-            .map(key => key + '=' + queryParams[key])
-            .join('&');
     }
 
 }
