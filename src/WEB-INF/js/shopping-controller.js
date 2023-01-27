@@ -57,7 +57,7 @@ class ShoppingController extends Controller {
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
             const offers = await response.json();
-            return offers.filter(offer => !!offer.orderReference);
+            return offers.filter(offer => !offer.orderReference);
         } catch (error) {
             this.displayMessage(error);
         }
@@ -231,7 +231,7 @@ class ShoppingController extends Controller {
             if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
 
             const offers = await response.json();
-            return offers.filter(offer => !!offer.orderReference);
+            return offers.filter(offer => !offer.orderReference);
         } catch (error) {
             this.displayMessage(error);
         }
