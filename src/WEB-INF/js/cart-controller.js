@@ -148,7 +148,7 @@ export default class CartController extends Controller {
 
     async removeOffer(offer) {
         const index = Controller.shoppingCart.findIndex(element => element.identity === offer.identity);
-        if (index !== -1) delete Controller.shoppingCart[index];
+        if (index !== -1) Controller.shoppingCart.splice(index, 1);
         this.clearPage();
         await this.updateShoppingCart();
     }
