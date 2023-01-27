@@ -27,13 +27,6 @@ export default class CartController extends Controller {
         await this.updateShoppingCart();
     }
 
-    removeOfferFromCart(shoppingCartOffer) {
-        const index = Controller.shoppingCart.indexOf(shoppingCartOffer);
-        if (index > -1) { // only splice array when item is found
-            Controller.shoppingCart.splice(index, 1); // 2nd parameter means remove one item only
-        }
-    }
-
     clearPage() {
         this.clearChildren(this.#centerArticle);
     }
@@ -59,15 +52,15 @@ export default class CartController extends Controller {
 
     getShoppingCartMap() {
         var map = {};
-        for (let i = 0; i < Controller.shoppingCart.length; i++) {
-            const selectedItem = Controller.shoppingCart[i];
-            const sellerReference = selectedItem.sellerReference;
-            if (map[sellerReference] != null) {
-                map[sellerReference].push(selectedItem);
+        for (const offer of Controller.shoppingCart) {
+            const sellerReference = offer.sellerReference;
+            if ("sellerReference" in map) {
+                map[sellerReference].push(offer);
             } else {
-                map[sellerReference] = [selectedItem];
+                map[sellerReference] = [offer];
             }
         }
+        
         return map;
     }
 
@@ -117,12 +110,8 @@ export default class CartController extends Controller {
             const sectionOffersTableRow = templateOffersTableRow.content.cloneNode(true).firstElementChild;
             tableBody.append(sectionOffersTableRow);
 
-            const addToCartButton = sectionOffersTableRow.querySelector("button.remove");
-            addToCartButton.addEventListener('click', async event => {
-                this.removeOfferFromCart(shoppingCartOffer);
-                this.clearPage();
-                await this.updateShoppingCart();
-            });
+            const removeFromCartButton = sectionOffersTableRow.querySelector("button.remove");
+            removeFromCartButton.addEventListener('click', async event => this.removeOffer(shoppingCartOffer));
 
             const rowCells = sectionOffersTableRow.querySelectorAll("td");
             const rowImages = sectionOffersTableRow.querySelectorAll("img");
@@ -157,24 +146,33 @@ export default class CartController extends Controller {
         sectionSellerInfo.querySelector("button.order-now").addEventListener('click', async event => await this.orderAll(offers));
     }
 
+    async removeOffer(offer) {
+        const index = Controller.shoppingCart.findIndex(element => element.identity === offer.identity);
+        if (index !== -1) delete Controller.shoppingCart[index];
+        this.clearPage();
+        await this.updateShoppingCart();
+    }
+
     async orderAll(offers) {
-        for (const offer of offers) {
-            this.displayMessage("");
-            try {
-                const headers = {"Content-Type": "application/json", "Accept": "text/plain"};
+        this.displayMessage("");
+        try {
+            const headers = {"Content-Type": "application/json", "Accept": "text/plain"};
+            const queryParams = new URLSearchParams();
+            for (const offer of offers)
+                queryParams.append("offerReference", offer.identity);
+            const order = {};
 
-                const response = await fetch("/services/orders?offerReference=" + offerId, {
-                    method: "POST", headers: headers, body: JSON.stringify({}), credentials: "include"
-                });
+            const response = await fetch("/services/orders?" + queryParams.toString(), {
+                method: "POST", headers: headers, body: JSON.stringify(order), credentials: "include"
+            });
 
-                if (!response.ok) {
-                    throw new Error("HTTP " + response.status + " " + response.statusText);
-                } else {
-                    this.removeOfferFromCart(offer);
-                }
-            } catch (error) {
-                this.displayMessage(error)
+            if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
+            for (const offer of offers) {
+                const index = Controller.shoppingCart.findIndex(element => element.identity === offer.identity);
+                if (index !== -1) delete Controller.shoppingCart[index];
             }
+        } catch (error) {
+            this.displayMessage(error)
         }
 
         this.clearPage();
