@@ -54,13 +54,13 @@ export default class CartController extends Controller {
         var map = {};
         for (const offer of Controller.shoppingCart) {
             const sellerReference = offer.sellerReference;
-            if ("sellerReference" in map) {
+            if (sellerReference.toString() in map) {
                 map[sellerReference].push(offer);
             } else {
                 map[sellerReference] = [offer];
             }
         }
-        
+
         return map;
     }
 
