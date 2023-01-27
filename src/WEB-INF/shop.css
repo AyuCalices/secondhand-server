@@ -176,7 +176,7 @@ section.offer-query div.seller-criteria label.horizontal {
 	width: 6em;
 }
 
-section.seller-selection img.avatar {
+section.seller-selection img.avatar, tr.cart-offer-display-table-row td img.avatar {
 	vertical-align: middle;
 	height: 2em;
 	width: 2em;
